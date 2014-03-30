@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
         xmlns:ignore="http://www.ignore.com"
         mc:Ignorable="d ignore"
         Height="600"
@@ -18,17 +19,21 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="0"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <DockPanel Grid.ColumnSpan="3">
-            <Button DockPanel.Dock="Right" Width="50" Margin="5" Command="{Binding EncodeCommand}">Start</Button>
+            <StackPanel DockPanel.Dock="Right">
+                <Button Width="50" Margin="5" Command="{Binding EncodeCommand}">Encode</Button>
+                <Button Width="50" Margin="5" Command="{Binding AnalyzeCommand}">Analyze</Button>
+            </StackPanel>
             <StackPanel DockPanel.Dock="Left">
                 <DockPanel Margin="5">
                     <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">Delta:</TextBlock>
@@ -47,8 +52,11 @@
             </StackPanel>
         </DockPanel>
         <TextBlock Grid.Column="0" Grid.Row="1" Margin="5,0">Original text</TextBlock>
-        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5,0">Encrypted text</TextBlock>
-        <TextBlock Grid.Column="2" Grid.Row="1" Margin="5,0">Decrypted text</TextBlock>
+        <TextBlock Grid.Column="0" Grid.Row="3" Margin="5,0">Decrypted text</TextBlock>
+        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5,0">Perr(delta)</TextBlock>
+        <TextBlock Grid.Column="2" Grid.Row="1" Margin="5,0">Perr(alpha)</TextBlock>
+        <TextBlock Grid.Column="1" Grid.Row="3" Margin="5,0">MSE(delta)</TextBlock>
+        <TextBlock Grid.Column="2" Grid.Row="3" Margin="5,0">MSE(alpha)</TextBlock>
 
         <TextBox 
             Text="{Binding OriginalText, UpdateSourceTrigger=PropertyChanged}"
@@ -59,22 +67,12 @@
             AcceptsTab="True" 
             TextWrapping="Wrap"
                 />
-        <TextBox 
-            Text="{Binding EncryptedText}"
-            Margin="5"
-            Grid.Column="1"
-            Grid.Row="2"
-            DockPanel.Dock="Left"
-            AcceptsReturn="True" 
-            AcceptsTab="True" 
-            TextWrapping="Wrap"
-            IsReadOnly="True"
-            />
+
         <TextBox 
             Text="{Binding DecryptedText}"
             Margin="5"
-            Grid.Column="2"
-            Grid.Row="2"
+            Grid.Column="0"
+            Grid.Row="4"
             DockPanel.Dock="Left"
             AcceptsReturn="True" 
             AcceptsTab="True" 
@@ -82,37 +80,35 @@
             IsReadOnly="True"
             />
 
-        <TextBox 
-            Text="{Binding OriginalTextAsBitArray, Mode=OneWay}"
-            Margin="5"
-            Grid.Column="0"
-            Grid.Row="3"
-            AcceptsReturn="True" 
-            AcceptsTab="True" 
-            TextWrapping="Wrap"
-            IsReadOnly="True"
-            />
-        <TextBox 
-            Text="{Binding EncryptedTextAsBitArray, Mode=OneWay}"
-            Margin="5"
-            Grid.Column="1"
-            Grid.Row="3"
-            DockPanel.Dock="Left"
-            AcceptsReturn="True" 
-            AcceptsTab="True" 
-            TextWrapping="Wrap"
-            IsReadOnly="True"
-            />
-        <TextBox 
-            Text="{Binding DecryptedTextAsBitArray, Mode=OneWay}"
-            Margin="5"
-            Grid.Column="2"
-            Grid.Row="3"
-            DockPanel.Dock="Left"
-            AcceptsReturn="True" 
-            AcceptsTab="True" 
-            TextWrapping="Wrap"
-            IsReadOnly="True"
-            />
+
+        <charting:Chart Margin="5" Grid.Row="2" Grid.Column="1">
+            <charting:LineSeries
+                                 ItemsSource="{Binding PerrDeltaChartData}"
+                                 DependentValuePath="Value" 
+                                 IndependentValuePath="Parameter" 
+                                 Title="Perr"/>
+        </charting:Chart>
+        <charting:Chart Margin="5" Grid.Row="4" Grid.Column="1">
+            <charting:LineSeries
+                                 ItemsSource="{Binding MseDeltaChartData}"
+                                 DependentValuePath="Value" 
+                                 IndependentValuePath="Parameter" 
+                                 Title="MSE"/>
+        </charting:Chart>
+
+        <charting:Chart Margin="5" Grid.Row="2" Grid.Column="2">
+            <charting:LineSeries
+                                 ItemsSource="{Binding PerrAlphaChartData}"
+                                 DependentValuePath="Value" 
+                                 IndependentValuePath="Parameter" 
+                                 Title="Perr"/>
+        </charting:Chart>
+        <charting:Chart Margin="5" Grid.Row="4" Grid.Column="2">
+            <charting:LineSeries
+                                 ItemsSource="{Binding MseAlphaChartData}"
+                                 DependentValuePath="Value" 
+                                 IndependentValuePath="Parameter" 
+                                 Title="MSE"/>
+        </charting:Chart>
     </Grid>
 </Window>

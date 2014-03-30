@@ -10,12 +10,13 @@ namespace KutterAlgorithm
     public class KutterEncipherer
     {
         private int _size = 0;
-        public Bitmap Encode(string text, Bitmap image, int delta, double alpha)
+        public Bitmap Encode(string text, Bitmap img, int delta, double alpha)
         {
+            var image = (Bitmap)img.Clone();
             var binText = text.ToBitString();
             int size = binText.Length;
             _size = size;
-            binText = size.ToBitString() + binText;
+            binText = size.ToBitString() + binText; // Добавление размера исходного сообщения к самому сообщению
             int x = delta, y = delta;
             foreach (var bit in binText)
             {
@@ -43,7 +44,7 @@ namespace KutterAlgorithm
                 image.SetPixel(x, y, Color.FromArgb(pixel.A, r, g, b));
 
                 x += (delta + 1);
-                if (x >= image.Width - delta)
+                if (x >= image.Width - delta) // Переход на новую строку
                 {
                     y += (delta + 1);
                     x = delta;
@@ -56,6 +57,11 @@ namespace KutterAlgorithm
 
         public string Decode(Bitmap image, int delta, double alpha)
         {
+            return AdjustLength(ReadBits(image, delta, alpha)).ToStringFromBinary();
+        }
+
+        public string ReadBits(Bitmap image, int delta, double alpha)
+        {
             var result = "";
             int x = delta, y = delta;
             int bitCount = 0;
@@ -64,6 +70,8 @@ namespace KutterAlgorithm
             {
                 var pixel = image.GetPixel(x, y);
                 var b = pixel.B;
+
+                // Вычисление среднего значения синего в окрестности
                 double bAvg = 0;
                 for (int i = x - delta; i <= x + delta; i++)
                 {
@@ -90,7 +98,9 @@ namespace KutterAlgorithm
                     result += "0";
                 }
                 ++bitCount;
-                if (bitCount == sizeof (int) * 8 && length < 0)
+
+                // Чтение длины сообщения
+                if (bitCount == sizeof(int) * 8 && length < 0)
                 {
                     //length = result.ToIntFromBinary();
                     length = _size;
@@ -98,24 +108,47 @@ namespace KutterAlgorithm
                 }
 
                 x += (delta + 1);
-                if (x >= image.Width - delta)
+                if (x >= image.Width - delta) // Переход на новую строку
                 {
                     y += (delta + 1);
                     x = delta;
                     if (y >= image.Height - delta)
-                        return AdjustLength(result).ToStringFromBinary();
+                        return result;
                 }
             };
-            return AdjustLength(result).ToStringFromBinary();
+            return result;
         }
-
-
 
         private string AdjustLength(string s)
         {
             var fixedText = s.TrimEnd(' ');
             fixedText = fixedText.PadRight(8 * (int)Math.Ceiling((double)fixedText.Length / 8));
             return fixedText;
+        }
+
+        public double CalculateMse(string text, Bitmap img, int delta, double alpha)
+        {
+            var newImg = Encode(text, img, delta, alpha);
+            double err = 0;
+            for (int x = 0; x < img.Width; x++)
+            {
+                for (int y = 0; y < img.Height; y++)
+                {
+                    err += Math.Pow(img.GetPixel(x, y).B - newImg.GetPixel(x, y).B, 2);
+                }
+            }
+            return err / (img.Height * img.Width);
+        }
+
+        public double CalculatePerr(string text, Bitmap img, int delta, double alpha)
+        {
+            var bits = text.ToBitString();
+            var newImg = Encode(text, img, delta, alpha);
+            var newBits = ReadBits(newImg, delta, alpha);
+            double errors = Enumerable.Range(0, Math.Min(bits.Length, newBits.Length))
+                       .Count(i => bits[i] != newBits[i]);
+            errors += Math.Abs(bits.Length - newBits.Length);
+            return errors / bits.Length;
         }
     }
 }
