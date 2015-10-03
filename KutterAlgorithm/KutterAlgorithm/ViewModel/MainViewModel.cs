@@ -25,12 +25,12 @@ namespace KutterAlgorithm.ViewModel
             public double Parameter { get; set; }
         }
 
-        private readonly KutterEncipherer _kutterEncipherer = new KutterEncipherer();
+        private readonly KutterEncipherer _encoder = new KutterEncipherer();
         private string _originalText;
         private string _imagePath;
-        private string _decryptedText;
+        private string _decodedText;
         private int _delta;
-        private double _alpha;
+        private double _lambda;
         private const int MinDelta = 1;
         private const double MinAlpha = 0.01;
         private const int MaxDelta = 20;
@@ -49,7 +49,6 @@ namespace KutterAlgorithm.ViewModel
             {
                 if (_originalText == value) return;
                 _originalText = AdjustLength(value);
-                //Encrypt();
                 RaisePropertyChanged(() => OriginalText);
                 RaisePropertyChanged(() => OriginalTextAsBitArray);
             }
@@ -69,18 +68,18 @@ namespace KutterAlgorithm.ViewModel
             }
         }
 
-        public string DecryptedText
+        public string DecodedText
         {
             get
             {
-                return _decryptedText;
+                return _decodedText;
             }
             set
             {
-                if (_decryptedText == value) return;
-                _decryptedText = value;
-                RaisePropertyChanged(() => DecryptedText);
-                RaisePropertyChanged(() => DecryptedTextAsBitArray);
+                if (_decodedText == value) return;
+                _decodedText = value;
+                RaisePropertyChanged(() => DecodedText);
+                RaisePropertyChanged(() => DecodedTextAsBitArray);
             }
         }
 
@@ -89,14 +88,9 @@ namespace KutterAlgorithm.ViewModel
             get { return (_originalText ?? "").ToBitString(); }
         }
 
-        //public string EncryptedTextAsBitArray
-        //{
-        //    get { return (_encryptedText ?? "").ToBitString(); }
-        //}
-
-        public string DecryptedTextAsBitArray
+        public string DecodedTextAsBitArray
         {
-            get { return (_decryptedText ?? "").ToBitString(); }
+            get { return (_decodedText ?? "").ToBitString(); }
         }
 
         public int Delta
@@ -109,23 +103,21 @@ namespace KutterAlgorithm.ViewModel
             {
                 if (_delta == value) return;
                 _delta = value;
-                //Encrypt();
                 RaisePropertyChanged(() => Delta);
             }
         }
 
-        public double Alpha
+        public double Lambda
         {
             get
             {
-                return _alpha;
+                return _lambda;
             }
             set
             {
-                if (_alpha == value) return;
-                _alpha = value;
-                //Encrypt();
-                RaisePropertyChanged(() => Alpha);
+                if (_lambda == value) return;
+                _lambda = value;
+                RaisePropertyChanged(() => Lambda);
             }
         }
 
@@ -149,13 +141,14 @@ namespace KutterAlgorithm.ViewModel
             PerrAlphaChartData = new ObservableCollection<ChartPoint>();
             MseAlphaChartData = new ObservableCollection<ChartPoint>();
             _delta = 2;
-            _alpha = 0.01;
-            _imagePath = @"C:\Users\Artyom\Desktop\TESV 2012-01-22 16-20-55-73.bmp";
+            _lambda = 0.01;
+            _imagePath = @"Resources\WP_20150826_18_17_01_Pro.png";
             OpenImgCommand = new RelayCommand(OpenImg);
             EncodeCommand = new RelayCommand(Encode, () => !string.IsNullOrEmpty(ImagePath));
             AnalyzeCommand = new RelayCommand(Analyze, () => !string.IsNullOrEmpty(ImagePath));
             OriginalText =
-                "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+                "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " +
+                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
         }
 
         private void OpenImg()
@@ -181,19 +174,19 @@ namespace KutterAlgorithm.ViewModel
             try
             {
                 var image = (Bitmap)Image.FromFile(ImagePath, true);
-                var newImg = _kutterEncipherer.Encode(OriginalText, image, Delta, Alpha);
+                var newImg = _encoder.Encode(OriginalText, image, Delta, Lambda);
                 var newPath = Path.Combine(Path.GetDirectoryName(ImagePath),
-                                           Path.GetFileNameWithoutExtension(ImagePath) + DateTime.Now.ToString("ddMMyyyyHHmmss") + Path.GetExtension(ImagePath));
+                                           Path.GetFileNameWithoutExtension(ImagePath) + DateTime.Now.ToString("_ddMMyyyyHHmmss") + Path.GetExtension(ImagePath));
                 newImg.Save(newPath);
 
                 newImg = (Bitmap)Image.FromFile(newPath, true);
                 try
                 {
-                    DecryptedText = _kutterEncipherer.Decode(newImg, Delta, Alpha);
+                    DecodedText = _encoder.Decode(newImg, Delta, Lambda);
                 }
                 catch (Exception)
                 {
-                    DecryptedText = "При декодировании возникли ошибки";
+                    DecodedText = "При декодировании возникли ошибки";
                 }
             }
             catch (Exception e)
@@ -202,11 +195,16 @@ namespace KutterAlgorithm.ViewModel
             }
         }
 
+        private void Decode()
+        {
+        }
+
+        #region Errors & graphs
         private void Analyze()
         {
             var image = (Bitmap)Image.FromFile(ImagePath, true);
-            AnalyzeDeltaMse(image, OriginalText, Alpha);
-            AnalyzeDeltaPerr(image, OriginalText, Alpha);
+            AnalyzeDeltaMse(image, OriginalText, Lambda);
+            AnalyzeDeltaPerr(image, OriginalText, Lambda);
             AnalyzeAlphaMse(image, OriginalText, Delta);
             AnalyzeAlphaPerr(image, OriginalText, Delta);
         }
@@ -288,11 +286,7 @@ namespace KutterAlgorithm.ViewModel
                 return kutter.CalculateMse(text, image, delta, alpha);
             });
         }
-
-        private void Decode()
-        {
-            //DecryptedText = _feistelEncipherer.Decrypt(EncryptedText, Delta);
-        }
+        #endregion
 
         ////public override void Cleanup()
         ////{

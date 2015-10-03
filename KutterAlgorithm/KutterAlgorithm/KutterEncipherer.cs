@@ -10,7 +10,7 @@ namespace KutterAlgorithm
     public class KutterEncipherer
     {
         private int _size = 0;
-        public Bitmap Encode(string text, Bitmap img, int delta, double alpha)
+        public Bitmap Encode(string text, Bitmap img, int delta, double lambda)
         {
             var image = (Bitmap)img.Clone();
             var binText = text.ToBitString();
@@ -26,7 +26,7 @@ namespace KutterAlgorithm
                 var b = pixel.B;
                 var l = 0.3 * r + 0.59 * g + 0.11 * b;
 
-                var diff = (byte)(alpha * l);
+                var diff = (byte)(lambda * l);
                 if (bit == '1')
                 {
                     b += diff;
@@ -55,12 +55,12 @@ namespace KutterAlgorithm
             return image;
         }
 
-        public string Decode(Bitmap image, int delta, double alpha)
+        public string Decode(Bitmap image, int delta, double lambda)
         {
-            return AdjustLength(ReadBits(image, delta, alpha)).ToStringFromBinary();
+            return AdjustLength(ReadBits(image, delta, lambda)).ToStringFromBinary();
         }
 
-        public string ReadBits(Bitmap image, int delta, double alpha)
+        public string ReadBits(Bitmap image, int delta, double lambda)
         {
             var result = "";
             int x = delta, y = delta;
@@ -126,9 +126,9 @@ namespace KutterAlgorithm
             return fixedText;
         }
 
-        public double CalculateMse(string text, Bitmap img, int delta, double alpha)
+        public double CalculateMse(string text, Bitmap img, int delta, double lambda)
         {
-            var newImg = Encode(text, img, delta, alpha);
+            var newImg = Encode(text, img, delta, lambda);
             double err = 0;
             for (int x = 0; x < img.Width; x++)
             {
@@ -140,11 +140,11 @@ namespace KutterAlgorithm
             return err / (img.Height * img.Width);
         }
 
-        public double CalculatePerr(string text, Bitmap img, int delta, double alpha)
+        public double CalculatePerr(string text, Bitmap img, int delta, double lambda)
         {
             var bits = text.ToBitString();
-            var newImg = Encode(text, img, delta, alpha);
-            var newBits = ReadBits(newImg, delta, alpha);
+            var newImg = Encode(text, img, delta, lambda);
+            var newBits = ReadBits(newImg, delta, lambda);
             double errors = Enumerable.Range(0, Math.Min(bits.Length, newBits.Length))
                        .Count(i => bits[i] != newBits[i]);
             errors += Math.Abs(bits.Length - newBits.Length);

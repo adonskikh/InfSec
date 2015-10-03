@@ -8,7 +8,7 @@
         mc:Ignorable="d ignore"
         Height="600"
         Width="800"
-        Title="Feistel"
+        Title="MainWindow"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
 
     <Window.Resources>
@@ -20,7 +20,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -29,34 +29,43 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <DockPanel Grid.ColumnSpan="3">
-            <StackPanel DockPanel.Dock="Right">
-                <Button Width="50" Margin="5" Command="{Binding EncodeCommand}">Encode</Button>
-                <Button Width="50" Margin="5" Command="{Binding AnalyzeCommand}">Analyze</Button>
-            </StackPanel>
-            <StackPanel DockPanel.Dock="Left">
-                <DockPanel Margin="5">
-                    <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">Delta:</TextBlock>
-                    <TextBox Text="{Binding Delta, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></TextBox>
-                </DockPanel>
+        
+        <Grid Grid.ColumnSpan="3" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="5"></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="5"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
 
-                <DockPanel Margin="5" Grid.ColumnSpan="3">
-                    <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">Alpha:</TextBlock>
-                    <TextBox Text="{Binding Alpha, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></TextBox>
-                </DockPanel>
-
-                <DockPanel Margin="5" Grid.ColumnSpan="3">
-                    <Button VerticalAlignment="Center" Margin="0,0,5,0" Padding="5,0" Command="{Binding OpenImgCommand}">Image...</Button>
-                    <TextBox Text="{Binding ImagePath, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></TextBox>
-                </DockPanel>
-            </StackPanel>
-        </DockPanel>
+            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Delta:</TextBlock>
+            <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Delta, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"></TextBox>
+            
+            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Lambda:</TextBlock>
+            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding Lambda, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"></TextBox>
+            
+            <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Image:</TextBlock>
+            <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding ImagePath, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></TextBox>
+            
+            <Button Grid.Row="0" Grid.Column="4" Width="50" Command="{Binding EncodeCommand}">Encode</Button>
+<!--            <Button Grid.Row="2" Grid.Column="4" Width="50" Command="{Binding AnalyzeCommand}">Analyze</Button>-->
+            <Button Grid.Row="4" Grid.Column="4" Width="50" Command="{Binding OpenImgCommand}">Browse...</Button>
+        </Grid>
+        
         <TextBlock Grid.Column="0" Grid.Row="1" Margin="5,0">Original text</TextBlock>
-        <TextBlock Grid.Column="0" Grid.Row="3" Margin="5,0">Decrypted text</TextBlock>
-        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5,0">Perr(delta)</TextBlock>
-        <TextBlock Grid.Column="2" Grid.Row="1" Margin="5,0">Perr(alpha)</TextBlock>
-        <TextBlock Grid.Column="1" Grid.Row="3" Margin="5,0">MSE(delta)</TextBlock>
-        <TextBlock Grid.Column="2" Grid.Row="3" Margin="5,0">MSE(alpha)</TextBlock>
+        <TextBlock Grid.Column="0" Grid.Row="3" Margin="5,0">Decoded text</TextBlock>
+        <!--        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5,0">Perr(delta)</TextBlock>-->
+        <!--        <TextBlock Grid.Column="2" Grid.Row="1" Margin="5,0">Perr(alpha)</TextBlock>-->
+        <!--        <TextBlock Grid.Column="1" Grid.Row="3" Margin="5,0">MSE(delta)</TextBlock>-->
+        <!--        <TextBlock Grid.Column="2" Grid.Row="3" Margin="5,0">MSE(alpha)</TextBlock>-->
 
         <TextBox 
             Text="{Binding OriginalText, UpdateSourceTrigger=PropertyChanged}"
@@ -67,48 +76,68 @@
             AcceptsTab="True" 
             TextWrapping="Wrap"
                 />
+        <TextBox 
+            Text="{Binding OriginalTextAsBitArray, Mode=OneWay}"
+            Margin="5"
+            Grid.Column="1"
+            Grid.Row="2"
+            AcceptsReturn="True" 
+            AcceptsTab="True" 
+            TextWrapping="Wrap"
+            IsReadOnly="True"
+                />
 
         <TextBox 
-            Text="{Binding DecryptedText}"
+            Text="{Binding DecodedText, Mode=OneWay}"
             Margin="5"
             Grid.Column="0"
             Grid.Row="4"
-            DockPanel.Dock="Left"
             AcceptsReturn="True" 
             AcceptsTab="True" 
-            TextWrapping="Wrap" 
+            TextWrapping="Wrap"
             IsReadOnly="True"
-            />
+                />
+
+        <TextBox 
+            Text="{Binding DecodedTextAsBitArray, Mode=OneWay}"
+            Margin="5"
+            Grid.Column="1"
+            Grid.Row="4"
+            AcceptsReturn="True" 
+            AcceptsTab="True" 
+            TextWrapping="Wrap"
+            IsReadOnly="True"
+                />
 
 
-        <charting:Chart Margin="5" Grid.Row="2" Grid.Column="1">
-            <charting:LineSeries
-                                 ItemsSource="{Binding PerrDeltaChartData}"
-                                 DependentValuePath="Value" 
-                                 IndependentValuePath="Parameter" 
-                                 Title="Perr"/>
-        </charting:Chart>
-        <charting:Chart Margin="5" Grid.Row="4" Grid.Column="1">
-            <charting:LineSeries
-                                 ItemsSource="{Binding MseDeltaChartData}"
-                                 DependentValuePath="Value" 
-                                 IndependentValuePath="Parameter" 
-                                 Title="MSE"/>
-        </charting:Chart>
-
-        <charting:Chart Margin="5" Grid.Row="2" Grid.Column="2">
-            <charting:LineSeries
-                                 ItemsSource="{Binding PerrAlphaChartData}"
-                                 DependentValuePath="Value" 
-                                 IndependentValuePath="Parameter" 
-                                 Title="Perr"/>
-        </charting:Chart>
-        <charting:Chart Margin="5" Grid.Row="4" Grid.Column="2">
-            <charting:LineSeries
-                                 ItemsSource="{Binding MseAlphaChartData}"
-                                 DependentValuePath="Value" 
-                                 IndependentValuePath="Parameter" 
-                                 Title="MSE"/>
-        </charting:Chart>
+        <!--        <charting:Chart Margin="5" Grid.Row="2" Grid.Column="1">-->
+        <!--            <charting:LineSeries-->
+        <!--                                 ItemsSource="{Binding PerrDeltaChartData}"-->
+        <!--                                 DependentValuePath="Value" -->
+        <!--                                 IndependentValuePath="Parameter" -->
+        <!--                                 Title="Perr"/>-->
+        <!--        </charting:Chart>-->
+        <!--        <charting:Chart Margin="5" Grid.Row="4" Grid.Column="1">-->
+        <!--            <charting:LineSeries-->
+        <!--                                 ItemsSource="{Binding MseDeltaChartData}"-->
+        <!--                                 DependentValuePath="Value" -->
+        <!--                                 IndependentValuePath="Parameter" -->
+        <!--                                 Title="MSE"/>-->
+        <!--        </charting:Chart>-->
+        <!---->
+<!--        <charting:Chart Margin="5" Grid.Row="2" Grid.Column="2">-->
+        <!--            <charting:LineSeries-->
+        <!--                                 ItemsSource="{Binding PerrAlphaChartData}"-->
+        <!--                                 DependentValuePath="Value" -->
+        <!--                                 IndependentValuePath="Parameter" -->
+        <!--                                 Title="Perr"/>-->
+        <!--        </charting:Chart>-->
+        <!--        <charting:Chart Margin="5" Grid.Row="4" Grid.Column="2">-->
+        <!--            <charting:LineSeries-->
+        <!--                                 ItemsSource="{Binding MseAlphaChartData}"-->
+        <!--                                 DependentValuePath="Value" -->
+        <!--                                 IndependentValuePath="Parameter" -->
+        <!--                                 Title="MSE"/>-->
+        <!--        </charting:Chart>-->
     </Grid>
 </Window>
