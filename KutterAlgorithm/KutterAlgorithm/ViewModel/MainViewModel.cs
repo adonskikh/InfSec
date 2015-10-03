@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using GalaSoft.MvvmLight;
@@ -26,18 +27,12 @@ namespace KutterAlgorithm.ViewModel
             public double Parameter { get; set; }
         }
 
-        private readonly KutterEncoder _encoder = new KutterEncoder();
         private string _originalText;
         private string _imagePath;
         private string _decodedText;
         private int _delta;
         private double _lambda;
-        private const int MinDelta = 1;
-        private const double MinAlpha = 0.01;
-        private const int MaxDelta = 20;
-        private const double MaxAlpha = 0.3;
-        private const int DeltaStep = 1;
-        private const double AlphaStep = 0.01;
+        private EncoderViewModel _selectedEncoder;
 
 
         public string OriginalText
@@ -122,14 +117,20 @@ namespace KutterAlgorithm.ViewModel
             }
         }
 
-        public ObservableCollection<ChartPoint> PerrDeltaChartData { get; private set; }
-        public ObservableCollection<ChartPoint> MseDeltaChartData { get; private set; }
-        public ObservableCollection<ChartPoint> PerrAlphaChartData { get; private set; }
-        public ObservableCollection<ChartPoint> MseAlphaChartData { get; private set; }
+        public ObservableCollection<EncoderViewModel> Encoders { get; private set; }
+
+        public EncoderViewModel SelectedEncoder
+        {
+            get { return _selectedEncoder; }
+            set
+            {
+                _selectedEncoder = value;
+                RaisePropertyChanged(() => SelectedEncoder);
+            }
+        }
 
         public RelayCommand OpenImgCommand { get; private set; }
         public RelayCommand EncodeCommand { get; private set; }
-        public RelayCommand AnalyzeCommand { get; private set; }
 
 
         /// <summary>
@@ -141,6 +142,14 @@ namespace KutterAlgorithm.ViewModel
             MseDeltaChartData = new ObservableCollection<ChartPoint>();
             PerrAlphaChartData = new ObservableCollection<ChartPoint>();
             MseAlphaChartData = new ObservableCollection<ChartPoint>();
+
+            Encoders = new ObservableCollection<EncoderViewModel>()
+            {
+                new EncoderViewModel("Kutter", () => new KutterEncoder(Delta, Lambda)),
+                new EncoderViewModel("LSB", () => new LsbEncoder())
+            };
+            SelectedEncoder = Encoders.First();
+
             _delta = 2;
             _lambda = 0.01;
             _imagePath = @"Resources\WP_20150826_18_17_01_Pro.png";
@@ -167,16 +176,18 @@ namespace KutterAlgorithm.ViewModel
         {
             try
             {
+                var encoder = SelectedEncoder.GetEncoderInstance();
                 var image = (Bitmap)Image.FromFile(ImagePath, true);
-                var newImg = _encoder.Encode(OriginalText, image, Delta, Lambda);
+                var newImg = encoder.Encode(OriginalText, image);
                 var newPath = Path.Combine(Path.GetDirectoryName(ImagePath),
-                                           Path.GetFileNameWithoutExtension(ImagePath) + DateTime.Now.ToString("_ddMMyyyyHHmmss") + Path.GetExtension(ImagePath));
+                    string.Format("{0}_{1}_{2}{3}", Path.GetFileNameWithoutExtension(ImagePath), SelectedEncoder.Name, DateTime.Now.ToString("ddMMyyyyHHmmss"), Path.GetExtension(ImagePath))
+                    );
                 newImg.Save(newPath);
 
                 newImg = (Bitmap)Image.FromFile(newPath, true);
                 try
                 {
-                    DecodedText = _encoder.Decode(newImg, Delta, Lambda);
+                    DecodedText = encoder.Decode(newImg);
                 }
                 catch (Exception)
                 {
@@ -194,6 +205,20 @@ namespace KutterAlgorithm.ViewModel
         }
 
         #region Errors & graphs
+
+        private const int MinDelta = 1;
+        private const double MinAlpha = 0.01;
+        private const int MaxDelta = 20;
+        private const double MaxLambda = 0.3;
+        private const int DeltaStep = 1;
+        private const double LambdaStep = 0.01;
+
+        public ObservableCollection<ChartPoint> PerrDeltaChartData { get; private set; }
+        public ObservableCollection<ChartPoint> MseDeltaChartData { get; private set; }
+        public ObservableCollection<ChartPoint> PerrAlphaChartData { get; private set; }
+        public ObservableCollection<ChartPoint> MseAlphaChartData { get; private set; }
+        public RelayCommand AnalyzeCommand { get; private set; }
+
         private void Analyze()
         {
             var image = (Bitmap)Image.FromFile(ImagePath, true);
@@ -239,7 +264,7 @@ namespace KutterAlgorithm.ViewModel
             var image = (Bitmap)img.Clone();
             Task.Factory.StartNew(() =>
             {
-                for (double alpha = MinAlpha; alpha <= MaxAlpha; alpha += AlphaStep)
+                for (double alpha = MinAlpha; alpha <= MaxLambda; alpha += LambdaStep)
                 {
                     var pErr = CalculatePerr(text, image, delta, alpha).Result;
                     var point = new ChartPoint() { Parameter = alpha, Value = pErr };
@@ -254,7 +279,7 @@ namespace KutterAlgorithm.ViewModel
             var image = (Bitmap)img.Clone();
             Task.Factory.StartNew(() =>
             {
-                for (double alpha = MinAlpha; alpha <= MaxAlpha; alpha += AlphaStep)
+                for (double alpha = MinAlpha; alpha <= MaxLambda; alpha += LambdaStep)
                 {
                     var mse = CalculateMse(text, image, delta, alpha).Result;
                     var point = new ChartPoint() { Parameter = alpha, Value = mse };
@@ -267,8 +292,8 @@ namespace KutterAlgorithm.ViewModel
         {
             return Task.Factory.StartNew(() =>
             {
-                var kutter = new KutterEncoder();
-                return kutter.CalculatePerr(text, image, delta, alpha);
+                var kutter = new KutterEncoder(delta, alpha);
+                return kutter.CalculatePerr(text, image);
             });
         }
 
@@ -276,8 +301,8 @@ namespace KutterAlgorithm.ViewModel
         {
             return Task.Factory.StartNew(() =>
             {
-                var kutter = new KutterEncoder();
-                return kutter.CalculateMse(text, image, delta, alpha);
+                var kutter = new KutterEncoder(delta, alpha);
+                return kutter.CalculateMse(text, image);
             });
         }
         #endregion

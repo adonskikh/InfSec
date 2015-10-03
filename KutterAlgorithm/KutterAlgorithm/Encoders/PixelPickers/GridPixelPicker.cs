@@ -12,28 +12,29 @@ namespace KutterAlgorithm.Encoders.PixelPickers
     /// </summary>
     public class GridPixelPicker : IPixelPicker
     {
-        private readonly Bitmap _image;
         private readonly int _delta;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="image"></param>
         /// <param name="delta">Расстояние между пикселями</param>
-        public GridPixelPicker(Bitmap image, int delta)
+        public GridPixelPicker(int delta)
         {
-            _image = image;
             _delta = delta;
         }
 
-        public Point GetNextPixel(int x, int y)
+        public Point GetNextPixel(Bitmap image, int x, int y)
         {
+            if (x == 0 && y == 0)
+            {
+                return new Point(_delta, _delta); // первая по порядку точка
+            }
             x += (_delta + 1);
-            if (x >= _image.Width - _delta) // Переход на новую строку
+            if (x >= image.Width - _delta) // Переход на новую строку
             {
                 y += (_delta + 1);
                 x = _delta;
-                if (y >= _image.Height - _delta)
+                if (y >= image.Height - _delta)
                     throw new Exception("The image is too small.");
             }
             return new Point(x, y);

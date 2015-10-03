@@ -111,10 +111,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Encoders\EncoderBase.cs" />
+    <Compile Include="Encoders\IEncoder.cs" />
+    <Compile Include="Encoders\LsbEncoder.cs" />
     <Compile Include="Encoders\KutterEncoder.cs" />
     <Compile Include="Encoders\PixelPickers\GridPixelPicker.cs" />
     <Compile Include="Encoders\PixelPickers\IPixelPicker.cs" />
     <Compile Include="SystemExtention.cs" />
+    <Compile Include="ViewModel\EncoderViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="MainWindow.xaml">

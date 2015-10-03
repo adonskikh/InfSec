@@ -11,6 +11,6 @@ namespace KutterAlgorithm.Encoders.PixelPickers
         /// Определяет точку, в которую следует записывать следующий бит данных по координатам текущей точки
         /// </summary>
         /// <returns></returns>
-        Point GetNextPixel(int x, int y);
+        Point GetNextPixel(Bitmap image, int x, int y);
     }
 }

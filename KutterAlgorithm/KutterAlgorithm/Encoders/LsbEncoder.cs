@@ -3,15 +3,11 @@ using KutterAlgorithm.Encoders.PixelPickers;
 
 namespace KutterAlgorithm.Encoders
 {
-    public class KutterEncoder : EncoderBase
+    public class LsbEncoder : EncoderBase
     {
-        private readonly int _delta;
-        private readonly double _lambda;
-
-        public KutterEncoder(int delta, double lambda)
+        public LsbEncoder()
         {
-            _delta = delta;
-            _lambda = lambda;
+            var delta = 2;
             PixelPicker = new GridPixelPicker(delta);
         }
 
@@ -28,26 +24,14 @@ namespace KutterAlgorithm.Encoders
             var r = pixel.R;
             var g = pixel.G;
             var b = pixel.B;
-            var l = 0.3 * r + 0.59 * g + 0.11 * b;
 
-            var diff = (byte)(_lambda * l);
             if (bit == '1')
             {
-                if ((int)b + (int)diff > 255) // защита от переполнения
-                {
-                    b = 255;
-                }
-                else
-                {
-                    b += diff;
-                }
+                b = (byte)(b | 1); // LSB 1
             }
             else
             {
-                if (diff > b) // защита от переполнения
-                    b = 0;
-                else
-                    b -= diff;
+                b = (byte)(b & 254); // LSB 0
             }
 
             image.SetPixel(x, y, Color.FromArgb(pixel.A, r, g, b));
@@ -65,30 +49,11 @@ namespace KutterAlgorithm.Encoders
             var pixel = image.GetPixel(x, y);
             var b = pixel.B;
 
-            // Вычисление среднего значения синего в окрестности
-            double bAvg = 0;
-            const int directions = 4;
-            for (int i = x - _delta; i <= x + _delta; i++)
-            {
-                if (i != x)
-                {
-                    bAvg += image.GetPixel(i, y).B;
-                }
-            }
-            for (int i = y - _delta; i <= y + _delta; i++)
-            {
-                if (i != y)
-                {
-                    bAvg += image.GetPixel(x, i).B;
-                }
-            }
-            bAvg /= directions * _delta;
-
-            if (bAvg <= b)
+            if ((b & 1) == 1) // LSB 1
             {
                 return '1';
             }
-            else
+            else // LSB 0
             {
                 return '0';
             }

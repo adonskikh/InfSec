@@ -36,6 +36,8 @@
                 <ColumnDefinition Width="5"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -46,18 +48,21 @@
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Delta:</TextBlock>
-            <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Delta, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"></TextBox>
             
-            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Lambda:</TextBlock>
+            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Image:</TextBlock>
+            <TextBox Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding ImagePath, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></TextBox>
+            
+            <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Delta (Kutter):</TextBlock>
+            <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding Delta, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"></TextBox>
+            
+            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Lambda (Kutter):</TextBlock>
             <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding Lambda, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"></TextBox>
             
-            <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Image:</TextBlock>
-            <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding ImagePath, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></TextBox>
+            <ListBox Grid.Row="2" Grid.Column="4" Grid.RowSpan="3" ItemsSource="{Binding Encoders}" SelectedItem="{Binding SelectedEncoder}" DisplayMemberPath="Name"/>
             
-            <Button Grid.Row="0" Grid.Column="4" Width="50" Command="{Binding EncodeCommand}">Encode</Button>
+            <Button Grid.Row="0" Grid.Column="6" Width="50" Command="{Binding OpenImgCommand}">Browse...</Button>
+            <Button Grid.Row="4" Grid.Column="6" Width="50" Command="{Binding EncodeCommand}">Encode</Button>
 <!--            <Button Grid.Row="2" Grid.Column="4" Width="50" Command="{Binding AnalyzeCommand}">Analyze</Button>-->
-            <Button Grid.Row="4" Grid.Column="4" Width="50" Command="{Binding OpenImgCommand}">Browse...</Button>
         </Grid>
         
         <TextBlock Grid.Column="0" Grid.Row="1" Margin="5,0">Original text</TextBlock>
