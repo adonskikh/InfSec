@@ -111,7 +111,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="KutterEncipherer.cs" />
+    <Compile Include="Encoders\KutterEncoder.cs" />
+    <Compile Include="Encoders\PixelPickers\GridPixelPicker.cs" />
+    <Compile Include="Encoders\PixelPickers\IPixelPicker.cs" />
     <Compile Include="SystemExtention.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />

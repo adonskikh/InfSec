@@ -8,6 +8,7 @@ using GalaSoft.MvvmLight;
 using System;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Threading;
+using KutterAlgorithm.Encoders;
 
 namespace KutterAlgorithm.ViewModel
 {
@@ -25,7 +26,7 @@ namespace KutterAlgorithm.ViewModel
             public double Parameter { get; set; }
         }
 
-        private readonly KutterEncipherer _encoder = new KutterEncipherer();
+        private readonly KutterEncoder _encoder = new KutterEncoder();
         private string _originalText;
         private string _imagePath;
         private string _decodedText;
@@ -48,7 +49,7 @@ namespace KutterAlgorithm.ViewModel
             set
             {
                 if (_originalText == value) return;
-                _originalText = AdjustLength(value);
+                _originalText = value;
                 RaisePropertyChanged(() => OriginalText);
                 RaisePropertyChanged(() => OriginalTextAsBitArray);
             }
@@ -162,13 +163,6 @@ namespace KutterAlgorithm.ViewModel
             }
         }
 
-        private string AdjustLength(string s)
-        {
-            var fixedText = s.TrimEnd(' ');
-            fixedText = fixedText.PadRight(8 * (int)Math.Ceiling((double)fixedText.Length / 8));
-            return fixedText;
-        }
-
         private void Encode()
         {
             try
@@ -273,7 +267,7 @@ namespace KutterAlgorithm.ViewModel
         {
             return Task.Factory.StartNew(() =>
             {
-                var kutter = new KutterEncipherer();
+                var kutter = new KutterEncoder();
                 return kutter.CalculatePerr(text, image, delta, alpha);
             });
         }
@@ -282,7 +276,7 @@ namespace KutterAlgorithm.ViewModel
         {
             return Task.Factory.StartNew(() =>
             {
-                var kutter = new KutterEncipherer();
+                var kutter = new KutterEncoder();
                 return kutter.CalculateMse(text, image, delta, alpha);
             });
         }

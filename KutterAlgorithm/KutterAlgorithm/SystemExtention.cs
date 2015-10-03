@@ -8,44 +8,46 @@ namespace System
 {
     public static class SystemExtention
     {
+        public const int BitsInByte = 8;
+
         public static uint ShiftLeft(this uint value, int shift)
         {
-            const int size = sizeof(uint) * 8;
+            const int size = sizeof(uint) * BitsInByte;
             shift = shift % size;
             return ((value << shift) | (value >> (size - shift)));
         }
 
         public static uint ShiftRight(this uint value, int shift)
         {
-            const int size = sizeof(int) * 8;
+            const int size = sizeof(int) * BitsInByte;
             shift = shift % size;
             return ((value >> shift) | (value << (size - shift)));
         }
 
         public static ulong ShiftLeft(this ulong value, int shift)
         {
-            const int size = sizeof(long) * 8;
+            const int size = sizeof(long) * BitsInByte;
             shift = shift % size;
             return ((value << shift) | (value >> (size - shift)));
         }
 
         public static ulong ShiftRight(this ulong value, int shift)
         {
-            const int size = sizeof(long) * 8;
+            const int size = sizeof(long) * BitsInByte;
             shift = shift % size;
             return ((value >> shift) | (value << (size - shift)));
         }
 
         public static ushort ShiftLeft(this ushort value, int shift)
         {
-            const int size = sizeof(short) * 8;
+            const int size = sizeof(short) * BitsInByte;
             shift = shift % size;
             return (ushort)((value << shift) | (value >> (size - shift)));
         }
 
         public static ushort ShiftRight(this ushort value, int shift)
         {
-            const int size = sizeof(short) * 8;
+            const int size = sizeof(short) * BitsInByte;
             shift = shift % size;
             return (ushort)((value >> shift) | (value << (size - shift)));
         }
@@ -101,7 +103,7 @@ namespace System
         {
             return new BitArray(s.ToByteArray());
         }
-        
+
 
         public static string ToBitString(this string input)
         {
@@ -112,9 +114,9 @@ namespace System
         {
             var byteList = new List<Byte>();
 
-            for (int i = 0; i < data.Length; i += 8)
+            for (int i = 0; i < data.Length; i += BitsInByte)
             {
-                byteList.Add(Convert.ToByte(data.Substring(i, 8), 2));
+                byteList.Add(Convert.ToByte(data.Substring(i, BitsInByte), 2));
             }
 
             return Encoding.Default.GetString(byteList.ToArray());
@@ -139,9 +141,9 @@ namespace System
         {
             var byteList = new List<Byte>();
 
-            for (int i = 0; i < data.Length; i += 8)
+            for (int i = 0; i < data.Length; i += BitsInByte)
             {
-                byteList.Add(Convert.ToByte(data.Substring(i, 8), 2));
+                byteList.Add(Convert.ToByte(data.Substring(i, BitsInByte), 2));
             }
 
             return BitConverter.ToInt32(byteList.ToArray(), 0);
@@ -158,7 +160,7 @@ namespace System
             var sb = new StringBuilder();
             foreach (byte b in bytes)
             {
-                sb.Append(Convert.ToString(b, 2).PadLeft(8, '0'));
+                sb.Append(Convert.ToString(b, 2).PadLeft(BitsInByte, '0'));
             }
             return sb.ToString();
         }
