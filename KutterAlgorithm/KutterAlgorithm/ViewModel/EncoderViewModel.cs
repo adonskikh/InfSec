@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
-using KutterAlgorithm.Encoders;
+using Steganography.Encoders;
 
-namespace KutterAlgorithm.ViewModel
+namespace Steganography.ViewModel
 {
     public class EncoderViewModel : ViewModelBase
     {

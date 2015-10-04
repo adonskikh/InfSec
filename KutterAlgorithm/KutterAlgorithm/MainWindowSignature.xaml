@@ -1,0 +1,48 @@
+﻿<Window x:Class="Steganography.MainWindowSignature"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+        xmlns:ignore="http://www.ignore.com"
+        mc:Ignorable="d ignore"
+        Height="600"
+        Width="800"
+        Title="MainWindowSignature"
+        DataContext="{Binding Signature, Source={StaticResource Locator}}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        
+
+
+        <DockPanel Grid.Row="0" Grid.Column="0">
+            <TextBlock VerticalAlignment="Center" Margin="5">Unsigned image:</TextBlock>
+            <Button DockPanel.Dock="Right" Margin="5" Width="50" Command="{Binding SignCommand}">Sign</Button>
+            <Button DockPanel.Dock="Right" Margin="5" Width="50" Command="{Binding OpenUnsignedImgCommand}">Browse...</Button>
+            <TextBox Text="{Binding UnsignedImagePath, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></TextBox>
+        </DockPanel>
+        <DockPanel Grid.Row="0" Grid.Column="1">
+            <TextBlock VerticalAlignment="Center" Margin="5">Signed image:</TextBlock>
+            <Button DockPanel.Dock="Right" Margin="5" Width="50" Command="{Binding CheckCommand}">Check</Button>
+            <Button DockPanel.Dock="Right" Margin="5" Width="50" Command="{Binding OpenSignedImgCommand}">Browse...</Button>
+            <TextBox Text="{Binding SignedImagePath, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></TextBox>
+        </DockPanel>
+    </Grid>
+</Window>

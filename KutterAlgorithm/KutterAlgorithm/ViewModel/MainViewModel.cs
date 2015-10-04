@@ -9,9 +9,9 @@ using GalaSoft.MvvmLight;
 using System;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Threading;
-using KutterAlgorithm.Encoders;
+using Steganography.Encoders;
 
-namespace KutterAlgorithm.ViewModel
+namespace Steganography.ViewModel
 {
     /// <summary>
     /// This class contains properties that the main View can data bind to.

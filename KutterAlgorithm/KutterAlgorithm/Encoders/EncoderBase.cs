@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
-using KutterAlgorithm.Encoders.PixelPickers;
+using Steganography.Encoders.PixelPickers;
 
-namespace KutterAlgorithm.Encoders
+namespace Steganography.Encoders
 {
     public abstract class EncoderBase : IEncoder
     {

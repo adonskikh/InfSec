@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
-using KutterAlgorithm.Encoders.PixelPickers;
+using Steganography.Encoders.PixelPickers;
 
-namespace KutterAlgorithm.Encoders
+namespace Steganography.Encoders
 {
     public class KutterEncoder : EncoderBase
     {

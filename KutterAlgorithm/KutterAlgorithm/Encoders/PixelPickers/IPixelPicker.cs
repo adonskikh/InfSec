@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace KutterAlgorithm.Encoders.PixelPickers
+namespace Steganography.Encoders.PixelPickers
 {
     /// <summary>
     /// Общий интерфейс для классов, которые выбирают, в какую точку изображения записывать следующий бит данных

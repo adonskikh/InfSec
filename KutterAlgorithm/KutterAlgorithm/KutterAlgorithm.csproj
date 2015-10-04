@@ -8,8 +8,8 @@
     <ProjectGuid>{C9A30238-FD16-4FEC-BC9A-693BA65CAB1E}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KutterAlgorithm</RootNamespace>
-    <AssemblyName>FeistelCipher</AssemblyName>
+    <RootNamespace>Steganography</RootNamespace>
+    <AssemblyName>Steganography</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -50,6 +50,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Signature|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Signature\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS SIGNATURE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight, Version=4.2.30.23230, Culture=neutral, PublicKeyToken=3e875cdb3903c512, processorArchitecture=MSIL">
@@ -117,10 +127,19 @@
     <Compile Include="Encoders\KutterEncoder.cs" />
     <Compile Include="Encoders\PixelPickers\GridPixelPicker.cs" />
     <Compile Include="Encoders\PixelPickers\IPixelPicker.cs" />
+    <Compile Include="MainWindowSignature.xaml.cs">
+      <DependentUpon>MainWindowSignature.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Signing\SimpleHashSigner.cs" />
     <Compile Include="SystemExtention.cs" />
     <Compile Include="ViewModel\EncoderViewModel.cs" />
+    <Compile Include="ViewModel\SignatureViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Page Include="MainWindowSignature.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

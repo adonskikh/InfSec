@@ -1,7 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using GalaSoft.MvvmLight.Threading;
 
-namespace KutterAlgorithm
+namespace Steganography
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -11,6 +12,17 @@ namespace KutterAlgorithm
         static App()
         {
             DispatcherHelper.Initialize();
+        }
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+#if SIGNATURE
+            var mainView = new MainWindowSignature();
+            mainView.Show();
+#else
+            var mainView = new MainWindow();
+            mainView.Show();
+#endif
         }
     }
 }

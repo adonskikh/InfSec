@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace KutterAlgorithm.Encoders
+namespace Steganography.Encoders
 {
     public interface IEncoder
     {

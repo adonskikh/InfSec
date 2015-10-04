@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KutterAlgorithm.Encoders.PixelPickers
+namespace Steganography.Encoders.PixelPickers
 {
     /// <summary>
     /// Выбирает пиксели для записи битов как узлы сетки с интервалом delta между пикселями
