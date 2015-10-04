@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Steganography.Encoders;
+using Steganography.Exceptions;
 using Steganography.Model;
 
 namespace Steganography.Signing
@@ -42,21 +43,27 @@ namespace Steganography.Signing
 
         public bool CheckSignature(Bitmap signedImage)
         {
-
-            var tiles = signedImage.SplitIntoTiles(TileSize, TileSize);
-            foreach (var tile in tiles)
+            try
             {
-                using (tile)
+                var tiles = signedImage.SplitIntoTiles(TileSize, TileSize);
+                foreach (var tile in tiles)
                 {
-                    var hash = CalculateSimpleHash(tile);
-                    var signature = _signatureEncoder.DecodeBits(tile.Bitmap);
-                    if (hash != signature)
+                    using (tile)
                     {
-                        return false;
+                        var hash = CalculateSimpleHash(tile);
+                        var signature = _signatureEncoder.DecodeBits(tile.Bitmap);
+                        if (hash != signature)
+                        {
+                            return false;
+                        }
                     }
                 }
+                return true;
             }
-            return true;
+            catch (SteganographyException e)
+            {
+                return false;
+            }
         }
         
         private string CalculateSimpleHash(Tile tile)

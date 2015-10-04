@@ -127,6 +127,7 @@
     <Compile Include="Encoders\KutterEncoder.cs" />
     <Compile Include="Encoders\PixelPickers\GridPixelPicker.cs" />
     <Compile Include="Encoders\PixelPickers\IPixelPicker.cs" />
+    <Compile Include="Exceptions\SteganographyException.cs" />
     <Compile Include="MainWindowSignature.xaml.cs">
       <DependentUpon>MainWindowSignature.xaml</DependentUpon>
     </Compile>

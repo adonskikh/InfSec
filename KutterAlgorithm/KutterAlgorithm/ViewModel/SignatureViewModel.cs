@@ -158,17 +158,10 @@ namespace Steganography.ViewModel
             {
                 ResetStatus();
                 var signer = new SimpleHashSigner(new LsbEncoder());
-                using (var image = (Bitmap)Image.FromFile(SignedImagePath, true))
+                using (var image = (Bitmap) Image.FromFile(SignedImagePath, true))
                 {
-                    try
-                    {
-                        var result = signer.CheckSignature(image);
-                        SetStatus(result);
-                    }
-                    catch (Exception e)
-                    {
-                        SetStatus(false);
-                    }
+                    var result = signer.CheckSignature(image);
+                    SetStatus(result);
                 }
             }
             catch (Exception e)

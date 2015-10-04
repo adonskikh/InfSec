@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Steganography.Exceptions;
 
 namespace Steganography.Encoders.PixelPickers
 {
@@ -35,7 +36,7 @@ namespace Steganography.Encoders.PixelPickers
                 y += (_delta + 1);
                 x = _delta;
                 if (y >= image.Height - _delta)
-                    throw new Exception("The image is too small.");
+                    throw new SteganographyException("The image is too small.");
             }
             return new Point(x, y);
         }
