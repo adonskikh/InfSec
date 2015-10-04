@@ -130,6 +130,7 @@
     <Compile Include="MainWindowSignature.xaml.cs">
       <DependentUpon>MainWindowSignature.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\Tile.cs" />
     <Compile Include="Signing\SimpleHashSigner.cs" />
     <Compile Include="SystemExtention.cs" />
     <Compile Include="ViewModel\EncoderViewModel.cs" />
@@ -193,6 +194,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\WP_20150826_18_17_01_Pro.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Document.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

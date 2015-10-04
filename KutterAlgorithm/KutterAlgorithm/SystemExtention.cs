@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
+using Steganography.Model;
 
 namespace System
 {
@@ -51,7 +53,7 @@ namespace System
             shift = shift % size;
             return (ushort)((value >> shift) | (value << (size - shift)));
         }
-        
+
 
         public static byte[] ToByteArray(this string s)
         {
@@ -77,7 +79,7 @@ namespace System
         {
             return BitConverter.GetBytes(s);
         }
-        
+
 
         public static BitArray ToBitArray(this string s)
         {
@@ -163,6 +165,84 @@ namespace System
                 sb.Append(Convert.ToString(b, 2).PadLeft(BitsInByte, '0'));
             }
             return sb.ToString();
+        }
+        
+        /// <summary>
+        /// Возвращает указанный фрагмент изображения как новый Bitmap
+        /// </summary>
+        /// <param name="img"></param>
+        /// <param name="xStart"></param>
+        /// <param name="yStart"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public static Bitmap GetArea(this Bitmap img, int xStart, int yStart, int width, int height)
+        {
+            var srcArea = new Rectangle(xStart, yStart, width, height);
+            var destArea = new Rectangle(0, 0, width, height);
+            var bitmap = new Bitmap(srcArea.Width, srcArea.Height, img.PixelFormat);
+
+            using (var g = Graphics.FromImage(bitmap))
+            {
+                g.DrawImage(img, destArea, srcArea, GraphicsUnit.Pixel);
+                return bitmap;
+            }
+        }
+        
+        /// <summary>
+        /// Разбивает изображение на тайлы указанного размера
+        /// </summary>
+        /// <param name="img"></param>
+        /// <param name="tileWidth"></param>
+        /// <param name="tileHeight"></param>
+        /// <returns></returns>
+        public static List<Tile> SplitIntoTiles(this Bitmap img, int tileWidth, int tileHeight)
+        {
+            var tiles = new List<Tile>();
+            for (var y = 0; y < img.Height; y += tileHeight)
+            {
+                if (y + tileHeight - 1 >= img.Height)
+                {
+                    continue;
+                }
+                for (var x = 0; x < img.Width; x += tileWidth)
+                {
+                    if (x + tileWidth - 1 >= img.Width)
+                    {
+                        continue;
+                    }
+                    tiles.Add(new Tile(x, y, img.GetArea(x, y, tileWidth, tileHeight)));
+                }
+            }
+            return tiles;
+        }
+
+        /// <summary>
+        /// Вычисляет среднюю яркость для пикселей указанного фрагмента изображения
+        /// </summary>
+        /// <param name="img"></param>
+        /// <param name="xStart"></param>
+        /// <param name="yStart"></param>
+        /// <param name="areaWidth"></param>
+        /// <param name="areaHeight"></param>
+        /// <returns></returns>
+        public static byte CalculateAvgAreaBrightness(this Bitmap img, int xStart, int yStart, int areaWidth, int areaHeight)
+        {
+            double sum = 0.0;
+            for (var y = yStart; y < yStart + areaHeight; y++)
+            {
+                for (var x = xStart; x < xStart + areaWidth; x++)
+                {
+                    var pixel = img.GetPixel(x, y);
+                    sum += pixel.R;
+                    sum += pixel.G;
+                    sum += pixel.B;
+                }
+            }
+            checked
+            {
+                return (byte)(sum / (areaHeight * areaWidth * 3));
+            }
         }
     }
 }

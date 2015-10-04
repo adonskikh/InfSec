@@ -12,13 +12,18 @@ namespace Steganography.Encoders
 
         public Bitmap Encode(string text, Bitmap img)
         {
-            var image = (Bitmap)img.Clone();
             var binText = text.ToBitString();
-            int size = binText.Length;
+            return EncodeBits(binText, img);
+        }
+
+        public Bitmap EncodeBits(string bitStr, Bitmap img)
+        {
+            var image = (Bitmap)img.Clone();
+            int size = bitStr.Length;
             _size = size;
-            binText = size.ToBitString() + binText; // Добавление размера исходного сообщения к самому сообщению
+            bitStr = size.ToBitString() + bitStr; // Добавление размера исходного сообщения к самому сообщению
             int x = 0, y = 0;
-            foreach (var bit in binText)
+            foreach (var bit in bitStr)
             {
                 var nextPixel = PixelPicker.GetNextPixel(img, x, y);
                 x = nextPixel.X;
@@ -40,10 +45,10 @@ namespace Steganography.Encoders
 
         public string Decode(Bitmap image)
         {
-            return ReadBits(image).ToStringFromBinary();
+            return DecodeBits(image).ToStringFromBinary();
         }
 
-        private string ReadBits(Bitmap image)
+        public string DecodeBits(Bitmap image)
         {
             var result = "";
             int x = 0, y = 0;
@@ -96,7 +101,7 @@ namespace Steganography.Encoders
         {
             var bits = text.ToBitString();
             var newImg = Encode(text, img);
-            var newBits = ReadBits(newImg);
+            var newBits = DecodeBits(newImg);
             double errors = Enumerable.Range(0, Math.Min(bits.Length, newBits.Length))
                 .Count(i => bits[i] != newBits[i]);
             errors += Math.Abs(bits.Length - newBits.Length);

@@ -6,43 +6,60 @@
         xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
         xmlns:ignore="http://www.ignore.com"
         mc:Ignorable="d ignore"
-        Height="600"
         Width="800"
-        Title="MainWindowSignature"
+        Height="480"
+        Title="Digital Signature Tool"
         DataContext="{Binding Signature, Source={StaticResource Locator}}">
 
     <Window.Resources>
         <ResourceDictionary>
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+                <Setter Property="Margin" Value="5"></Setter>
+                <Setter Property="FontSize" Value="18"></Setter>
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
+                <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+                <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+                <Setter Property="Margin" Value="5"></Setter>
+                <Setter Property="FontSize" Value="14"></Setter>
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
+                <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+                <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+                <Setter Property="Margin" Value="5"></Setter>
+                <Setter Property="FontSize" Value="18"></Setter>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid>
+    <Grid Margin="20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="100"></ColumnDefinition>
+            <ColumnDefinition Width="100"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0">Unsigned image:</TextBlock>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding UnsignedImagePath, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        <Button Grid.Row="0" Grid.Column="2" Command="{Binding OpenUnsignedImgCommand}">Browse...</Button>
+        <Button Grid.Row="0" Grid.Column="3" Command="{Binding SignCommand}">Sign</Button>
+
+        <TextBlock Grid.Row="1" Grid.Column="0">Signed image:</TextBlock>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SignedImagePath, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        <Button Grid.Row="1" Grid.Column="2" Command="{Binding OpenSignedImgCommand}">Browse...</Button>
+        <Button Grid.Row="1" Grid.Column="3" Command="{Binding CheckCommand}">Check</Button>
         
+        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Text="{Binding Status}" HorizontalAlignment="Center" FontSize="32"></TextBlock>
 
-
-        <DockPanel Grid.Row="0" Grid.Column="0">
-            <TextBlock VerticalAlignment="Center" Margin="5">Unsigned image:</TextBlock>
-            <Button DockPanel.Dock="Right" Margin="5" Width="50" Command="{Binding SignCommand}">Sign</Button>
-            <Button DockPanel.Dock="Right" Margin="5" Width="50" Command="{Binding OpenUnsignedImgCommand}">Browse...</Button>
-            <TextBox Text="{Binding UnsignedImagePath, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></TextBox>
-        </DockPanel>
-        <DockPanel Grid.Row="0" Grid.Column="1">
-            <TextBlock VerticalAlignment="Center" Margin="5">Signed image:</TextBlock>
-            <Button DockPanel.Dock="Right" Margin="5" Width="50" Command="{Binding CheckCommand}">Check</Button>
-            <Button DockPanel.Dock="Right" Margin="5" Width="50" Command="{Binding OpenSignedImgCommand}">Browse...</Button>
-            <TextBox Text="{Binding SignedImagePath, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></TextBox>
-        </DockPanel>
     </Grid>
 </Window>

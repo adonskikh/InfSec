@@ -7,7 +7,11 @@ namespace Steganography.Encoders
     {
         Bitmap Encode(string text, Bitmap img);
 
+        Bitmap EncodeBits(string bitStr, Bitmap img);
+
         string Decode(Bitmap image);
+
+        string DecodeBits(Bitmap image);
 
         double CalculateMse(string text, Bitmap img);
 

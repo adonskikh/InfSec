@@ -24,11 +24,10 @@ namespace Steganography.ViewModel
     {
         private string _unsignedImagePath;
         private string _signedImagePath;
-        private int _delta;
-        private double _lambda;
+        private string _status;
         private EncoderViewModel _selectedEncoder;
 
-
+        
         public string UnsignedImagePath
         {
             get
@@ -54,36 +53,23 @@ namespace Steganography.ViewModel
             {
                 if (_signedImagePath == value) return;
                 _signedImagePath = value;
+                ResetStatus();
                 RaisePropertyChanged(() => SignedImagePath);
             }
         }
 
-
-        public int Delta
+        
+        public string Status
         {
             get
             {
-                return _delta;
+                return _status;
             }
             set
             {
-                if (_delta == value) return;
-                _delta = value;
-                RaisePropertyChanged(() => Delta);
-            }
-        }
-
-        public double Lambda
-        {
-            get
-            {
-                return _lambda;
-            }
-            set
-            {
-                if (_lambda == value) return;
-                _lambda = value;
-                RaisePropertyChanged(() => Lambda);
+                if (_status == value) return;
+                _status = value;
+                RaisePropertyChanged(() => Status);
             }
         }
 
@@ -110,16 +96,8 @@ namespace Steganography.ViewModel
         /// </summary>
         public SignatureViewModel()
         {
-            Encoders = new ObservableCollection<EncoderViewModel>()
-            {
-                new EncoderViewModel("Kutter", () => new KutterEncoder(Delta, Lambda)),
-                new EncoderViewModel("LSB", () => new LsbEncoder())
-            };
-            SelectedEncoder = Encoders.First();
-
-            _delta = 2;
-            _lambda = 0.01;
-            _unsignedImagePath = @"Resources\WP_20150826_18_17_01_Pro.png";
+            _status = "";
+            _unsignedImagePath = @"Resources\Document.png";
             OpenUnsignedImgCommand = new RelayCommand(OpenUnsignedImage);
             OpenSignedImgCommand = new RelayCommand(OpenSignedImage);
             SignCommand = new RelayCommand(Sign, () => !string.IsNullOrEmpty(UnsignedImagePath));
@@ -157,14 +135,16 @@ namespace Steganography.ViewModel
             try
             {
                 var signer = new SimpleHashSigner(new LsbEncoder());
-                var image = (Bitmap) Image.FromFile(UnsignedImagePath, true);
-                var newImg = signer.Sign(image);
-                var newPath = Path.Combine(Path.GetDirectoryName(UnsignedImagePath),
-                    string.Format("{0}_{1}_{2}{3}", Path.GetFileNameWithoutExtension(UnsignedImagePath), "SIGNED",
-                        DateTime.Now.ToString("ddMMyyyyHHmmss"), Path.GetExtension(UnsignedImagePath))
-                    );
-                newImg.Save(newPath);
-                SignedImagePath = newPath;
+                using (var image = (Bitmap) Image.FromFile(UnsignedImagePath, true))
+                {
+                    var newImg = signer.Sign(image);
+                    var newPath = Path.Combine(Path.GetDirectoryName(UnsignedImagePath),
+                        string.Format("{0}_{1}_{2}{3}", Path.GetFileNameWithoutExtension(UnsignedImagePath), "SIGNED",
+                            DateTime.Now.ToString("ddMMyyyyHHmmss"), Path.GetExtension(UnsignedImagePath))
+                        );
+                    newImg.Save(newPath);
+                    SignedImagePath = newPath;
+                }
             }
             catch (Exception e)
             {
@@ -174,14 +154,53 @@ namespace Steganography.ViewModel
 
         private void CheckSignature()
         {
+            try
+            {
+                ResetStatus();
+                var signer = new SimpleHashSigner(new LsbEncoder());
+                using (var image = (Bitmap)Image.FromFile(SignedImagePath, true))
+                {
+                    try
+                    {
+                        var result = signer.CheckSignature(image);
+                        SetStatus(result);
+                    }
+                    catch (Exception e)
+                    {
+                        SetStatus(false);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                SetStatus(false);
+                System.Windows.MessageBox.Show(e.Message);
+            }
+        }
+
+        private void ResetStatus()
+        {
+            Status = "";
+        }
+
+        private void SetStatus(bool signatureIsValid)
+        {
+            if (signatureIsValid)
+            {
+                Status = "Signature is valid.";
+            }
+            else
+            {
+                Status = "Signature is not valid.";
+            }
         }
 
 
-        ////public override void Cleanup()
-        ////{
-        ////    // Clean up if needed
+        //public override void Cleanup()
+        //{
+        //    // Clean up if needed
 
-        ////    base.Cleanup();
-        ////}
+        //    base.Cleanup();
+        //}
     }
 }
