@@ -66,8 +66,8 @@ namespace Steganography.Encoders
                 // Выделение длины сообщения (записывается как первые 32 бита кодированного сообщения)
                 if (bitCount == sizeof(int) * SystemExtention.BitsInByte && length < 0)
                 {
-                    length = result.ToIntFromBinary();
-                    //length = _size;
+                    //length = result.ToIntFromBinary();
+                    length = _size;
                     result = "";
                 }
             };

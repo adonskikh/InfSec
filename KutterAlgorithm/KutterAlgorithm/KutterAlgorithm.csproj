@@ -15,6 +15,7 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -27,7 +28,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -69,6 +69,9 @@
     <Reference Include="GalaSoft.MvvmLight.Extras, Version=4.2.30.23230, Culture=neutral, PublicKeyToken=48c5515dce1bf64d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MvvmLightLibs.4.2.30.0\lib\net35\GalaSoft.MvvmLight.Extras.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageProcessor">
+      <HintPath>..\packages\ImageProcessor.2.3.0.0\lib\net45\ImageProcessor.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -128,6 +131,9 @@
     <Compile Include="Encoders\PixelPickers\GridPixelPicker.cs" />
     <Compile Include="Encoders\PixelPickers\IPixelPicker.cs" />
     <Compile Include="Exceptions\SteganographyException.cs" />
+    <Compile Include="ImageProcessing\ProcessingParameters.cs" />
+    <Compile Include="ImageProcessing\ProcessingResult.cs" />
+    <Compile Include="ImageProcessing\ImageProcessor.cs" />
     <Compile Include="MainWindowSignature.xaml.cs">
       <DependentUpon>MainWindowSignature.xaml</DependentUpon>
     </Compile>

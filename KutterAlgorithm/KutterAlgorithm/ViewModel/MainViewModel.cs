@@ -10,6 +10,10 @@ using System;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Threading;
 using Steganography.Encoders;
+using System.Collections.Generic;
+using Steganography.ImageProcessing;
+using System.Xml.Serialization;
+using System.Xml;
 
 namespace Steganography.ViewModel
 {
@@ -156,9 +160,9 @@ namespace Steganography.ViewModel
             OpenImgCommand = new RelayCommand(OpenImg);
             EncodeCommand = new RelayCommand(Encode, () => !string.IsNullOrEmpty(ImagePath));
             AnalyzeCommand = new RelayCommand(Analyze, () => !string.IsNullOrEmpty(ImagePath));
+            AnalyzeTransformCommand = new RelayCommand(AnalyzeTransform, () => !string.IsNullOrEmpty(ImagePath));
             OriginalText =
-                "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " +
-                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+                "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ";
         }
 
         private void OpenImg()
@@ -180,7 +184,7 @@ namespace Steganography.ViewModel
                 var image = (Bitmap)Image.FromFile(ImagePath, true);
                 var newImg = encoder.Encode(OriginalText, image);
                 var newPath = Path.Combine(Path.GetDirectoryName(ImagePath),
-                    string.Format("{0}_{1}_{2}{3}", Path.GetFileNameWithoutExtension(ImagePath), SelectedEncoder.Name, DateTime.Now.ToString("ddMMyyyyHHmmss"), Path.GetExtension(ImagePath))
+                    string.Format("{0}_{1}_{2}{3}", Path.GetFileNameWithoutExtension(ImagePath), SelectedEncoder.Name,  GetTimeStamp(), Path.GetExtension(ImagePath))
                     );
                 newImg.Save(newPath);
 
@@ -204,20 +208,26 @@ namespace Steganography.ViewModel
         {
         }
 
+        private string GetTimeStamp()
+        {
+            return DateTime.Now.ToString("ddMMyyyyHHmmss");
+        }
+
         #region Errors & graphs
 
         private const int MinDelta = 1;
-        private const double MinAlpha = 0.01;
-        private const int MaxDelta = 20;
-        private const double MaxLambda = 0.3;
+        private const double MinLambda = 0.002;
+        private const int MaxDelta = 8;
+        private const double MaxLambda = 0.03;
         private const int DeltaStep = 1;
-        private const double LambdaStep = 0.01;
+        private const double LambdaStep = 0.002;
 
         public ObservableCollection<ChartPoint> PerrDeltaChartData { get; private set; }
         public ObservableCollection<ChartPoint> MseDeltaChartData { get; private set; }
         public ObservableCollection<ChartPoint> PerrAlphaChartData { get; private set; }
         public ObservableCollection<ChartPoint> MseAlphaChartData { get; private set; }
         public RelayCommand AnalyzeCommand { get; private set; }
+        public RelayCommand AnalyzeTransformCommand { get; private set; }
 
         private void Analyze()
         {
@@ -227,6 +237,36 @@ namespace Steganography.ViewModel
             AnalyzeAlphaMse(image, OriginalText, Delta);
             AnalyzeAlphaPerr(image, OriginalText, Delta);
         }
+
+        private void AnalyzeTransform()
+        {
+            var results = new List<ProcessingResult>();
+            var scaleX = 0.5;
+            var scaleY = 0.9;
+            var processor = new ImageProcessing.ImageProcessor();
+            for (var angle = 0; angle < 3; angle++)
+            {
+                var parameters = new ProcessingParameters()
+                {
+                    RotationAngle = angle,
+                    ScaleX = scaleX,
+                    ScaleY = scaleY
+                };
+                results.Add(processor.ProcessImage(ImagePath, parameters));
+            }
+            SaveResults(results);
+        }
+
+        private void SaveResults(List<ProcessingResult> results)
+        {
+            var path = Path.Combine(string.Format("Transform_{0}.xml", GetTimeStamp()));
+            var serializer = new XmlSerializer(results.GetType());
+            using (var writer = new StreamWriter(path))
+            {
+                serializer.Serialize(writer, results);
+            }
+        }
+
 
         private void AnalyzeDeltaPerr(Bitmap img, string text, double alpha)
         {
@@ -252,7 +292,7 @@ namespace Steganography.ViewModel
                 for (int delta = MinDelta; delta <= MaxDelta; delta += DeltaStep)
                 {
                     var mse = CalculateMse(text, image, delta, alpha).Result;
-                    var point = new ChartPoint() { Parameter = delta, Value = mse };
+                    var point = new ChartPoint() { Parameter = delta, Value = Math.Round(mse, 2) };
                     DispatcherHelper.CheckBeginInvokeOnUI(() => MseDeltaChartData.Add(point));
                 }
             });
@@ -264,7 +304,7 @@ namespace Steganography.ViewModel
             var image = (Bitmap)img.Clone();
             Task.Factory.StartNew(() =>
             {
-                for (double alpha = MinAlpha; alpha <= MaxLambda; alpha += LambdaStep)
+                for (double alpha = MinLambda; alpha <= MaxLambda; alpha += LambdaStep)
                 {
                     var pErr = CalculatePerr(text, image, delta, alpha).Result;
                     var point = new ChartPoint() { Parameter = alpha, Value = pErr };
@@ -279,7 +319,7 @@ namespace Steganography.ViewModel
             var image = (Bitmap)img.Clone();
             Task.Factory.StartNew(() =>
             {
-                for (double alpha = MinAlpha; alpha <= MaxLambda; alpha += LambdaStep)
+                for (double alpha = MinLambda; alpha <= MaxLambda; alpha += LambdaStep)
                 {
                     var mse = CalculateMse(text, image, delta, alpha).Result;
                     var point = new ChartPoint() { Parameter = alpha, Value = mse };
