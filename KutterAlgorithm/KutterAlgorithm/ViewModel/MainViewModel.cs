@@ -11,6 +11,7 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Threading;
 using Steganography.Encoders;
 using System.Collections.Generic;
+using Steganography.Encoders.ErrorEstimation;
 using Steganography.ImageProcessing;
 using System.Xml.Serialization;
 using System.Xml;
@@ -210,7 +211,7 @@ namespace Steganography.ViewModel
 
         private string GetTimeStamp()
         {
-            return DateTime.Now.ToString("ddMMyyyyHHmmss");
+            return DateTime.Now.ToString("yyyyMMddHHmmss");
         }
 
         #region Errors & graphs
@@ -240,26 +241,21 @@ namespace Steganography.ViewModel
 
         private void AnalyzeTransform()
         {
-            var results = new List<ProcessingResult>();
-            var scaleX = 0.5;
-            var scaleY = 0.9;
-            var processor = new ImageProcessing.ImageProcessor();
-            for (var angle = 0; angle < 3; angle++)
-            {
-                var parameters = new ProcessingParameters()
-                {
-                    RotationAngle = angle,
-                    ScaleX = scaleX,
-                    ScaleY = scaleY
-                };
-                results.Add(processor.ProcessImage(ImagePath, parameters));
-            }
+            var test = new RobustnessTest();
+            var encoder = SelectedEncoder.GetEncoderInstance();
+            var text = OriginalText;
+            var imagePath = ImagePath;
+            var results = test.Test(imagePath, text, encoder);
             SaveResults(results);
         }
 
-        private void SaveResults(List<ProcessingResult> results)
+        private void SaveResults(List<RobustnessTestResult> results)
         {
-            var path = Path.Combine(string.Format("Transform_{0}.xml", GetTimeStamp()));
+            var path = Path.Combine(
+                Path.GetDirectoryName(ImagePath), 
+                "Processed",
+                string.Format("Transform_{0}.xml", GetTimeStamp())
+                );
             var serializer = new XmlSerializer(results.GetType());
             using (var writer = new StreamWriter(path))
             {
@@ -328,21 +324,25 @@ namespace Steganography.ViewModel
             });
         }
 
-        private Task<double> CalculatePerr(string text, Bitmap image, int delta, double alpha)
+        private Task<double> CalculatePerr(string text, Bitmap emptyContainer, int delta, double alpha)
         {
             return Task.Factory.StartNew(() =>
             {
                 var kutter = new KutterEncoder(delta, alpha);
-                return kutter.CalculatePerr(text, image);
+                var fullContainer = kutter.Encode(text, emptyContainer);
+                var estimator = new BitReadingErrorEstimator();
+                return estimator.Estimate(text, fullContainer, kutter);
             });
         }
 
-        private Task<double> CalculateMse(string text, Bitmap image, int delta, double alpha)
+        private Task<double> CalculateMse(string text, Bitmap emptyContainer, int delta, double alpha)
         {
             return Task.Factory.StartNew(() =>
             {
                 var kutter = new KutterEncoder(delta, alpha);
-                return kutter.CalculateMse(text, image);
+                var fullContainer = kutter.Encode(text, emptyContainer);
+                var estimator = new MseEstimator();
+                return estimator.Estimate(emptyContainer, fullContainer);
             });
         }
         #endregion

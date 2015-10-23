@@ -12,9 +12,5 @@ namespace Steganography.Encoders
         string Decode(Bitmap image);
 
         string DecodeBits(Bitmap image);
-
-        double CalculateMse(string text, Bitmap img);
-
-        double CalculatePerr(string text, Bitmap img);
     }
 }

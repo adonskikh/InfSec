@@ -1,13 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Documents;
 using Steganography.Encoders.PixelPickers;
+using Steganography.Exceptions;
 
 namespace Steganography.Encoders
 {
     public abstract class EncoderBase : IEncoder
     {
         private int _size = 0;
+        /// <summary>
+        /// Количество раз, которые записывается длина сообщения
+        /// </summary>
+        private const int LengthRecordsCount = 15;
+        private const int LengthRecordSize = sizeof(int) * SystemExtention.BitsInByte;
         protected IPixelPicker PixelPicker;
 
         public Bitmap Encode(string text, Bitmap img)
@@ -21,7 +29,7 @@ namespace Steganography.Encoders
             var image = (Bitmap)img.Clone();
             int size = bitStr.Length;
             _size = size;
-            bitStr = size.ToBitString() + bitStr; // Добавление размера исходного сообщения к самому сообщению
+            bitStr = string.Concat(Enumerable.Repeat(size.ToBitString(), LengthRecordsCount)) + bitStr; // Добавление размера исходного сообщения к самому сообщению
             int x = 0, y = 0;
             foreach (var bit in bitStr)
             {
@@ -56,19 +64,37 @@ namespace Steganography.Encoders
             int length = -1;
             while (result.Length < length || length < 0)
             {
-                var nextPixel = PixelPicker.GetNextPixel(image, x, y);
-                x = nextPixel.X;
-                y = nextPixel.Y;
-
-                result += ReadBit(image, x, y);
-                ++bitCount;
-
-                // Выделение длины сообщения (записывается как первые 32 бита кодированного сообщения)
-                if (bitCount == sizeof(int) * SystemExtention.BitsInByte && length < 0)
+                try
                 {
-                    //length = result.ToIntFromBinary();
-                    length = _size;
-                    result = "";
+                    var nextPixel = PixelPicker.GetNextPixel(image, x, y);
+                    x = nextPixel.X;
+                    y = nextPixel.Y;
+
+                    result += ReadBit(image, x, y);
+                    ++bitCount;
+
+                    // Выделение длины сообщения (записывается как первые 32 бита кодированного сообщения)
+                    if (bitCount == LengthRecordSize * LengthRecordsCount && length < 0)
+                    {
+                        var lengthRecords = new List<int>();
+                        for (int i = 0; i < result.Length; i += LengthRecordSize)
+                        {
+                            var lengthBits = result.Substring(i, LengthRecordSize);
+                            lengthRecords.Add(lengthBits.ToIntFromBinary());
+                        }
+                        // в качестве длины сообщения берется наиболее часто встречающееся значение, чтобы избежать части ошибок
+                        length = lengthRecords
+                            .GroupBy(l => l)
+                            .OrderByDescending(g => g.Count())
+                            .First() // throws InvalidOperationException if myArray is empty
+                            .Key;
+                        //length = _size;
+                        result = "";
+                    }
+                }
+                catch (SteganographyException e) // превышение размера изображения при чтении
+                {
+                    break;
                 }
             };
             return result;
@@ -83,29 +109,5 @@ namespace Steganography.Encoders
         /// <returns>'1' или '0'</returns>
         protected abstract char ReadBit(Bitmap image, int x, int y);
 
-        public double CalculateMse(string text, Bitmap img)
-        {
-            var newImg = Encode(text, img);
-            double err = 0;
-            for (int x = 0; x < img.Width; x++)
-            {
-                for (int y = 0; y < img.Height; y++)
-                {
-                    err += Math.Pow(img.GetPixel(x, y).B - newImg.GetPixel(x, y).B, 2);
-                }
-            }
-            return err / (img.Height * img.Width);
-        }
-
-        public double CalculatePerr(string text, Bitmap img)
-        {
-            var bits = text.ToBitString();
-            var newImg = Encode(text, img);
-            var newBits = DecodeBits(newImg);
-            double errors = Enumerable.Range(0, Math.Min(bits.Length, newBits.Length))
-                .Count(i => bits[i] != newBits[i]);
-            errors += Math.Abs(bits.Length - newBits.Length);
-            return errors / bits.Length;
-        }
     }
 }

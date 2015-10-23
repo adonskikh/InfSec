@@ -125,6 +125,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Encoders\EncoderBase.cs" />
+    <Compile Include="Encoders\ErrorEstimation\BitReadingErrorEstimator.cs" />
+    <Compile Include="Encoders\ErrorEstimation\MseEstimator.cs" />
     <Compile Include="Encoders\IEncoder.cs" />
     <Compile Include="Encoders\LsbEncoder.cs" />
     <Compile Include="Encoders\KutterEncoder.cs" />
@@ -132,7 +134,8 @@
     <Compile Include="Encoders\PixelPickers\IPixelPicker.cs" />
     <Compile Include="Exceptions\SteganographyException.cs" />
     <Compile Include="ImageProcessing\ProcessingParameters.cs" />
-    <Compile Include="ImageProcessing\ProcessingResult.cs" />
+    <Compile Include="ImageProcessing\RobustnessTest.cs" />
+    <Compile Include="ImageProcessing\RobustnessTestResult.cs" />
     <Compile Include="ImageProcessing\ImageProcessor.cs" />
     <Compile Include="MainWindowSignature.xaml.cs">
       <DependentUpon>MainWindowSignature.xaml</DependentUpon>

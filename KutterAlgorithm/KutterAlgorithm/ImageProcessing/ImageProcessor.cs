@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,26 +13,21 @@ namespace Steganography.ImageProcessing
 {
     public class ImageProcessor
     {
-        public ProcessingResult ProcessImage(string imagePath, ProcessingParameters parameters)
+        public Bitmap ProcessImage(Bitmap image, ProcessingParameters parameters)
         {
             using (var imageFactory = new ImageFactory(preserveExifData: true))
             {
-                imageFactory.Load(imagePath);
-                Resize(imageFactory, parameters);
-                Rotate(imageFactory, parameters);
-
-
-                var newPath = Path.Combine(Path.GetDirectoryName(imagePath), "Processed",
-                    string.Format("{0}_{1}{2}", Path.GetFileNameWithoutExtension(imagePath), DateTime.Now.ToString("ddMMyyyyHHmmss"), Path.GetExtension(imagePath))
-                    );
-                imageFactory.Save(newPath);
-                var result = new ProcessingResult()
+                using (var stream = new MemoryStream())
                 {
-                    SourceImagePath = imagePath,
-                    ProcessedImagePath = newPath,
-                    Parameters = parameters
-                };
-                return result;
+                    image.Save(stream, ImageFormat.Png);
+                    imageFactory.Load(stream);
+                    Resize(imageFactory, parameters);
+                    Crop(imageFactory, parameters);
+                    Rotate(imageFactory, parameters);
+                    imageFactory.Save(stream);
+                    var result = new Bitmap(stream);
+                    return result;
+                }
             }
         }
 
@@ -57,11 +53,11 @@ namespace Steganography.ImageProcessing
 
         private void Crop(ImageFactory imageFactory, ProcessingParameters parameters)
         {
-            if (parameters.RotationAngle == 0)
+            if (parameters.CropPercentX == 0 && parameters.CropPercentY == 0)
             {
                 return;
             }
-            imageFactory.Rotate(parameters.RotationAngle);
+            imageFactory.Crop(new CropLayer(0, 0, parameters.CropPercentX, parameters.CropPercentY, CropMode.Percentage));
         }
     }
 }
