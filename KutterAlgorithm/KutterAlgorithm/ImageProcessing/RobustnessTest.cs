@@ -13,14 +13,14 @@ namespace Steganography.ImageProcessing
     public class RobustnessTest
     {
         readonly ImageProcessor processor = new ImageProcessor();
-        readonly BitReadingErrorEstimator errorEstimator = new BitReadingErrorEstimator();
+        readonly HammingDistanceCalculator errorEstimator = new HammingDistanceCalculator();
 
         public List<RobustnessTestResult> Test(string imagePath, string text, IEncoder encoder)
         {
             var results = new List<RobustnessTestResult>();
             var emptyContainer = LoadImage(imagePath);
             var fullContainer = encoder.Encode(text, emptyContainer);
-            var untransformedContainerErrorRate = errorEstimator.Estimate(text, fullContainer, encoder);
+            var untransformedContainerErrorRate = errorEstimator.EstimateBitErrorRate(text, fullContainer, encoder);
             for (var angle = 0; angle <= 0; angle++)
             {
                 for (var scale = 1.0f; scale >= 1f; scale-=0.1f)
@@ -72,7 +72,7 @@ namespace Steganography.ImageProcessing
                 processedImage.Save(processedPath);
                 result.ProcessedImagePath = processedPath;
             }
-            result.ErrorRateTransformed = errorEstimator.Estimate(hiddenText, processedImage, encoder);
+            result.ErrorRateTransformed = errorEstimator.EstimateBitErrorRate(hiddenText, processedImage, encoder);
             return result;
         }
 

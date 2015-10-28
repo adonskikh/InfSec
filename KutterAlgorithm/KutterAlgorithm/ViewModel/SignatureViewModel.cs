@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace Steganography.ViewModel
         private string _status;
         private EncoderViewModel _selectedEncoder;
 
-        
+
         public string UnsignedImagePath
         {
             get
@@ -58,7 +59,7 @@ namespace Steganography.ViewModel
             }
         }
 
-        
+
         public string Status
         {
             get
@@ -135,12 +136,12 @@ namespace Steganography.ViewModel
             try
             {
                 var signer = new SimpleHashSigner(new LsbEncoder());
-                using (var image = (Bitmap) Image.FromFile(UnsignedImagePath, true))
+                using (var image = (Bitmap)Image.FromFile(UnsignedImagePath, true))
                 {
                     var newImg = signer.Sign(image);
                     var newPath = Path.Combine(Path.GetDirectoryName(UnsignedImagePath),
                         string.Format("{0}_{1}_{2}{3}", Path.GetFileNameWithoutExtension(UnsignedImagePath), "SIGNED",
-                            DateTime.Now.ToString("ddMMyyyyHHmmss"), Path.GetExtension(UnsignedImagePath))
+                            GetTimeStamp(), Path.GetExtension(UnsignedImagePath))
                         );
                     newImg.Save(newPath);
                     SignedImagePath = newPath;
@@ -158,10 +159,20 @@ namespace Steganography.ViewModel
             {
                 ResetStatus();
                 var signer = new SimpleHashSigner(new LsbEncoder());
-                using (var image = (Bitmap) Image.FromFile(SignedImagePath, true))
+                using (var image = (Bitmap)Image.FromFile(SignedImagePath, true))
                 {
-                    var result = signer.CheckSignature(image);
-                    SetStatus(result);
+                    var result = signer.ValidateSignature(image);
+                    SetStatus(result.SignatureIsValid);
+                    // сохраняем изображение с пометками проверки
+                    var path = Path.Combine(
+                        Path.GetDirectoryName(UnsignedImagePath),
+                        string.Format("{0}_{1}_{2}{3}", Path.GetFileNameWithoutExtension(UnsignedImagePath),
+                            "INVALID_SIGNATURE",
+                            GetTimeStamp(),
+                            Path.GetExtension(UnsignedImagePath))
+                        );
+                    result.ImageWithValidationMarks.Save(path);
+                    Process.Start(path);
                 }
             }
             catch (Exception e)
@@ -186,6 +197,11 @@ namespace Steganography.ViewModel
             {
                 Status = "Signature is not valid.";
             }
+        }
+
+        private string GetTimeStamp()
+        {
+            return DateTime.Now.ToString("yyyyMMddHHmmss");
         }
 
 

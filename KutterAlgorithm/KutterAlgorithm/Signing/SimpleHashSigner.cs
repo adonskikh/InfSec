@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Steganography.Encoders;
+using Steganography.Encoders.ErrorEstimation;
 using Steganography.Exceptions;
 using Steganography.Model;
 
@@ -14,6 +15,7 @@ namespace Steganography.Signing
     {
         private readonly IEncoder _signatureEncoder;
         private const int TileSize = 32;
+        private const int MaxHammingDistance = 1;
 
         public SimpleHashSigner(IEncoder signatureEncoder)
         {
@@ -41,31 +43,53 @@ namespace Steganography.Signing
             return signedImage;
         }
 
-        public bool CheckSignature(Bitmap signedImage)
+        public SignatureValidationResult ValidateSignature(Bitmap signedImage)
         {
-            try
+            var tiles = signedImage.SplitIntoTiles(TileSize, TileSize);
+            var signatureIsValid = true;
+            var hammingCalculator = new HammingDistanceCalculator();
+            using (var graphics = Graphics.FromImage(signedImage))
             {
-                var tiles = signedImage.SplitIntoTiles(TileSize, TileSize);
                 foreach (var tile in tiles)
                 {
                     using (tile)
                     {
                         var hash = CalculateSimpleHash(tile);
                         var signature = _signatureEncoder.DecodeBits(tile.Bitmap);
-                        if (hash != signature)
+                        var hammingDistance = hammingCalculator.Calculate(hash, signature);
+                        if (hammingDistance > MaxHammingDistance)
                         {
-                            return false;
+                            signatureIsValid = false;
+                            DrawBorder(graphics, tile);
+                        }
+                        if (hammingDistance > 0)
+                        {
+                            DrawHammingDistance(graphics, tile, hammingDistance);
                         }
                     }
                 }
-                return true;
             }
-            catch (SteganographyException e)
+            return new SignatureValidationResult()
             {
-                return false;
-            }
+                ImageWithValidationMarks = signedImage,
+                SignatureIsValid = signatureIsValid
+            };
         }
-        
+
+        private void DrawBorder(Graphics graphics, Tile tile)
+        {
+            graphics.DrawRectangle(new Pen(Color.Magenta), tile.X, tile.Y, tile.Bitmap.Width, tile.Bitmap.Height);
+        }
+
+        private void DrawHammingDistance(Graphics graphics, Tile tile, int hammingDistance)
+        {
+            var str = hammingDistance.ToString();
+            var font = new Font("Arial", 8);
+            var brush = new SolidBrush(Color.Magenta);
+            var drawPoint = new Point(tile.X + 2, tile.Y + 2);
+            graphics.DrawString(str, font, brush, drawPoint);
+        }
+
         private string CalculateSimpleHash(Tile tile)
         {
             const int brightnessThreshold = 127;

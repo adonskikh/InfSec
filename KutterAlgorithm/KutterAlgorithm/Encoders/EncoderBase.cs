@@ -14,7 +14,11 @@ namespace Steganography.Encoders
         /// <summary>
         /// Количество раз, которые записывается длина сообщения
         /// </summary>
+#if SIGNATURE 
+        private const int LengthRecordsCount = 1;
+#else
         private const int LengthRecordsCount = 15;
+#endif
         private const int LengthRecordSize = sizeof(int) * SystemExtention.BitsInByte;
         protected IPixelPicker PixelPicker;
 

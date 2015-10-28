@@ -330,8 +330,8 @@ namespace Steganography.ViewModel
             {
                 var kutter = new KutterEncoder(delta, alpha);
                 var fullContainer = kutter.Encode(text, emptyContainer);
-                var estimator = new BitReadingErrorEstimator();
-                return estimator.Estimate(text, fullContainer, kutter);
+                var estimator = new HammingDistanceCalculator();
+                return estimator.EstimateBitErrorRate(text, fullContainer, kutter);
             });
         }
 
@@ -341,8 +341,8 @@ namespace Steganography.ViewModel
             {
                 var kutter = new KutterEncoder(delta, alpha);
                 var fullContainer = kutter.Encode(text, emptyContainer);
-                var estimator = new MseEstimator();
-                return estimator.Estimate(emptyContainer, fullContainer);
+                var estimator = new MseCalculator();
+                return estimator.Calculate(emptyContainer, fullContainer);
             });
         }
         #endregion

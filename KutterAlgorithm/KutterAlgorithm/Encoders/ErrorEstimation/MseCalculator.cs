@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Steganography.Encoders.ErrorEstimation
 {
-    public class MseEstimator
+    public class MseCalculator
     {
-        public double Estimate(Bitmap emptyContainer, Bitmap fullContainer)
+        public double Calculate(Bitmap emptyContainer, Bitmap fullContainer)
         {
             double err = 0;
             var width = Math.Min(emptyContainer.Width, fullContainer.Width);

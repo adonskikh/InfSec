@@ -125,8 +125,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Encoders\EncoderBase.cs" />
-    <Compile Include="Encoders\ErrorEstimation\BitReadingErrorEstimator.cs" />
-    <Compile Include="Encoders\ErrorEstimation\MseEstimator.cs" />
+    <Compile Include="Encoders\ErrorEstimation\HammingDistanceCalculator.cs" />
+    <Compile Include="Encoders\ErrorEstimation\MseCalculator.cs" />
     <Compile Include="Encoders\IEncoder.cs" />
     <Compile Include="Encoders\LsbEncoder.cs" />
     <Compile Include="Encoders\KutterEncoder.cs" />
@@ -141,6 +141,7 @@
       <DependentUpon>MainWindowSignature.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\Tile.cs" />
+    <Compile Include="Signing\SignatureValidationResult.cs" />
     <Compile Include="Signing\SimpleHashSigner.cs" />
     <Compile Include="SystemExtention.cs" />
     <Compile Include="ViewModel\EncoderViewModel.cs" />
