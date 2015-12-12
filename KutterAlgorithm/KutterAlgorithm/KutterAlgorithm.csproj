@@ -124,6 +124,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Analysis\AnalysisResult.cs" />
+    <Compile Include="Analysis\KnownContainerAnalyzer.cs" />
+    <Compile Include="Analysis\ChosenContainerAnalyzer.cs" />
     <Compile Include="Encoders\EncoderBase.cs" />
     <Compile Include="Encoders\ErrorEstimation\HammingDistanceCalculator.cs" />
     <Compile Include="Encoders\ErrorEstimation\MseCalculator.cs" />
@@ -133,6 +136,7 @@
     <Compile Include="Encoders\PixelPickers\GridPixelPicker.cs" />
     <Compile Include="Encoders\PixelPickers\IPixelPicker.cs" />
     <Compile Include="Exceptions\SteganographyException.cs" />
+    <Compile Include="ImageProcessing\Normalyzer.cs" />
     <Compile Include="ImageProcessing\ProcessingParameters.cs" />
     <Compile Include="ImageProcessing\RobustnessTest.cs" />
     <Compile Include="ImageProcessing\RobustnessTestResult.cs" />

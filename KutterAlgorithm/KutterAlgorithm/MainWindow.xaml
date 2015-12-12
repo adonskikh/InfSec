@@ -64,8 +64,12 @@
             <Button Grid.Row="0" Grid.Column="6" Width="50" Command="{Binding OpenImgCommand}">Browse...</Button>
             <Button Grid.Row="4" Grid.Column="6" Width="50" Command="{Binding EncodeCommand}">Encode</Button>
             <Button Grid.Row="2" Grid.Column="6" Width="50" Command="{Binding AnalyzeCommand}">Analyze</Button>
-            
-            <Button Grid.Row="2" Grid.Column="8" Width="70" Command="{Binding AnalyzeTransformCommand}">Transform</Button>
+
+            <Button Grid.Row="0" Grid.Column="8" Width="100" Command="{Binding AnalyzeTransformCommand}">Transform</Button>
+
+            <Button Grid.Row="2" Grid.Column="8" Width="100" Command="{Binding AnalyzeKnownContainerCommand}">Known container</Button>
+
+            <Button Grid.Row="4" Grid.Column="8" Width="100" Command="{Binding AnalyzeChosenContainerCommand}">Chosen container</Button>
         </Grid>
 
        

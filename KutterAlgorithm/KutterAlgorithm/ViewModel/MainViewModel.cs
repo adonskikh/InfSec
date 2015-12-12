@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +11,7 @@ using GalaSoft.MvvmLight;
 using System;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Threading;
+using Steganography.Analysis;
 using Steganography.Encoders;
 using System.Collections.Generic;
 using Steganography.Encoders.ErrorEstimation;
@@ -162,6 +165,8 @@ namespace Steganography.ViewModel
             EncodeCommand = new RelayCommand(Encode, () => !string.IsNullOrEmpty(ImagePath));
             AnalyzeCommand = new RelayCommand(Analyze, () => !string.IsNullOrEmpty(ImagePath));
             AnalyzeTransformCommand = new RelayCommand(AnalyzeTransform, () => !string.IsNullOrEmpty(ImagePath));
+            AnalyzeChosenContainerCommand = new RelayCommand(AnalyzeChosenContainer, () => !string.IsNullOrEmpty(ImagePath));
+            AnalyzeKnownContainerCommand = new RelayCommand(AnalyzeKnownContainer, () => !string.IsNullOrEmpty(ImagePath));
             OriginalText =
                 "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ";
         }
@@ -214,7 +219,7 @@ namespace Steganography.ViewModel
             return DateTime.Now.ToString("yyyyMMddHHmmss");
         }
 
-        #region Errors & graphs
+        #region Errors, analysis & graphs
 
         private const int MinDelta = 1;
         private const double MinLambda = 0.002;
@@ -229,6 +234,10 @@ namespace Steganography.ViewModel
         public ObservableCollection<ChartPoint> MseAlphaChartData { get; private set; }
         public RelayCommand AnalyzeCommand { get; private set; }
         public RelayCommand AnalyzeTransformCommand { get; private set; }
+
+        public RelayCommand AnalyzeKnownContainerCommand { get; private set; }
+
+        public RelayCommand AnalyzeChosenContainerCommand { get; private set; }
 
         private void Analyze()
         {
@@ -247,6 +256,50 @@ namespace Steganography.ViewModel
             var imagePath = ImagePath;
             var results = test.Test(imagePath, text, encoder);
             SaveResults(results);
+        }
+
+        private void AnalyzeKnownContainer()
+        {
+            try
+            {
+                var encoder = SelectedEncoder.GetEncoderInstance();
+                var empty = (Bitmap)Image.FromFile(ImagePath, true);
+                var full = encoder.Encode(OriginalText, empty);
+                var analyzer = new KnownContainerAnalyzer();
+                var results = analyzer.Analyze(empty, full);
+                SaveAnalysisResults(results);
+            }
+            catch (Exception e)
+            {
+                System.Windows.MessageBox.Show(e.Message);
+            }
+        }
+
+        private void AnalyzeChosenContainer()
+        {
+            try
+            {
+                var encoder = SelectedEncoder.GetEncoderInstance();
+                var analyzer = new ChosenContainerAnalyzer();
+                var results = analyzer.Analyze(encoder);
+                SaveAnalysisResults(results);
+            }
+            catch (Exception e)
+            {
+                System.Windows.MessageBox.Show(e.Message);
+            }
+        }
+
+        private void SaveAnalysisResults(IEnumerable<AnalysisResult> results)
+        {
+            var folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AnalysisResults", GetTimeStamp());
+            Directory.CreateDirectory(folder);
+            foreach (var analysisResult in results)
+            {
+                var path = Path.Combine(folder, analysisResult.Name + ".bmp");
+                analysisResult.Image.Save(path, ImageFormat.Bmp);
+            }
+            Process.Start(folder);
         }
 
         private void SaveResults(List<RobustnessTestResult> results)
