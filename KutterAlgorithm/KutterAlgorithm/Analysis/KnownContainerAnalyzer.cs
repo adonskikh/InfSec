@@ -11,12 +11,6 @@ namespace Steganography.Analysis
 {
     public class KnownContainerAnalyzer
     {
-        private const int ContainerWidth = 1024;
-
-        private const int ContainerHeight = 768;
-
-        private const string Text = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-
         public List<AnalysisResult> Analyze(Bitmap emptyContainer, Bitmap fullContainer)
         {
             var results = new List<AnalysisResult>()
