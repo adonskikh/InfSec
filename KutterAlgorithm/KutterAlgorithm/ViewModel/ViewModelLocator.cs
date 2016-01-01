@@ -29,6 +29,7 @@ namespace Steganography.ViewModel
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<SignatureViewModel>();
+            SimpleIoc.Default.Register<ConcealmentViewModel>();
         }
 
         /// <summary>
@@ -44,11 +45,20 @@ namespace Steganography.ViewModel
                 return ServiceLocator.Current.GetInstance<MainViewModel>();
             }
         }
+
         public SignatureViewModel Signature
         {
             get
             {
                 return ServiceLocator.Current.GetInstance<SignatureViewModel>();
+            }
+        }
+
+        public ConcealmentViewModel Concealment
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<ConcealmentViewModel>();
             }
         }
 

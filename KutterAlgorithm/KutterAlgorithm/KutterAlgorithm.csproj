@@ -61,6 +61,16 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Concealment|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Concealment\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;CONCEALMENT</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight, Version=4.2.30.23230, Culture=neutral, PublicKeyToken=3e875cdb3903c512, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -127,31 +137,44 @@
     <Compile Include="Analysis\AnalysisResult.cs" />
     <Compile Include="Analysis\KnownContainerAnalyzer.cs" />
     <Compile Include="Analysis\ChosenContainerAnalyzer.cs" />
+    <Compile Include="Converters\ImageConverter.cs" />
     <Compile Include="Encoders\EncoderBase.cs" />
     <Compile Include="Encoders\ErrorEstimation\HammingDistanceCalculator.cs" />
     <Compile Include="Encoders\ErrorEstimation\MseCalculator.cs" />
+    <Compile Include="Encoders\FeistelEncoder.cs" />
     <Compile Include="Encoders\IEncoder.cs" />
     <Compile Include="Encoders\LsbEncoder.cs" />
     <Compile Include="Encoders\KutterEncoder.cs" />
+    <Compile Include="Encoders\PixelPickers\GridPixelPickerExcludeColor.cs" />
     <Compile Include="Encoders\PixelPickers\GridPixelPicker.cs" />
     <Compile Include="Encoders\PixelPickers\IPixelPicker.cs" />
     <Compile Include="Exceptions\SteganographyException.cs" />
+    <Compile Include="ImageProcessing\AreaHider.cs" />
     <Compile Include="ImageProcessing\Normalyzer.cs" />
     <Compile Include="ImageProcessing\ProcessingParameters.cs" />
     <Compile Include="ImageProcessing\RobustnessTest.cs" />
     <Compile Include="ImageProcessing\RobustnessTestResult.cs" />
     <Compile Include="ImageProcessing\ImageProcessor.cs" />
+    <Compile Include="MainWindowConcealment.xaml.cs">
+      <DependentUpon>MainWindowConcealment.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindowSignature.xaml.cs">
       <DependentUpon>MainWindowSignature.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Messages\AreaSelectedMessage.cs" />
     <Compile Include="Model\Tile.cs" />
     <Compile Include="Signing\SignatureValidationResult.cs" />
     <Compile Include="Signing\SimpleHashSigner.cs" />
     <Compile Include="SystemExtention.cs" />
     <Compile Include="ViewModel\EncoderViewModel.cs" />
+    <Compile Include="ViewModel\ConcealmentViewModel.cs" />
     <Compile Include="ViewModel\SignatureViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Page Include="MainWindowConcealment.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindowSignature.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -11,6 +11,11 @@ namespace Steganography.Encoders
             PixelPicker = new GridPixelPicker(delta);
         }
 
+        public LsbEncoder(IPixelPicker pixelPicker)
+        {
+            PixelPicker = pixelPicker;
+        }
+
         /// <summary>
         /// Записывает 1 бит сообщения в указанную точку с координатами (x,y)
         /// </summary>

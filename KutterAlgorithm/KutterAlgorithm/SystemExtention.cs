@@ -75,6 +75,11 @@ namespace System
             return BitConverter.GetBytes(s);
         }
 
+        public static byte[] ToByteArray(this byte s)
+        {
+            return BitConverter.GetBytes(s);
+        }
+
         public static byte[] ToByteArray(this ushort s)
         {
             return BitConverter.GetBytes(s);
@@ -134,6 +139,11 @@ namespace System
             return ConvertBytesToBitString(input.ToByteArray());
         }
 
+        public static string ToBitString(this byte input)
+        {
+            return Convert.ToString(input, 2).PadLeft(8, '0');
+        }
+
         public static string ToBitString(this int input)
         {
             return ConvertBytesToBitString(input.ToByteArray());
@@ -151,6 +161,11 @@ namespace System
             return BitConverter.ToInt32(byteList.ToArray(), 0);
         }
 
+        public static byte ToByteFromBinary(this string data)
+        {
+            return Convert.ToByte(data.Substring(0, BitsInByte), 2);
+        }
+
         public static string ToBitString(this ushort input)
         {
             return ConvertBytesToBitString(input.ToByteArray());
@@ -165,6 +180,12 @@ namespace System
                 sb.Append(Convert.ToString(b, 2).PadLeft(BitsInByte, '0'));
             }
             return sb.ToString();
+        }
+        public static string Reverse(this string s)
+        {
+            char[] charArray = s.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
         }
         
         /// <summary>
@@ -243,6 +264,43 @@ namespace System
             {
                 return (byte)(sum / (areaHeight * areaWidth * 3));
             }
+        }
+
+        public static string ToBitString(this Bitmap img)
+        {
+            var strBuilder = new StringBuilder();
+            for (int y = 0; y < img.Height; y++)
+            {
+                for (int x = 0; x < img.Width; x++)
+                {
+                    var pixel = img.GetPixel(x, y);
+                    strBuilder.Append(pixel.R.ToBitString());
+                    strBuilder.Append(pixel.G.ToBitString());
+                    strBuilder.Append(pixel.B.ToBitString());
+                }
+            }
+            return strBuilder.ToString();
+        }
+
+        public static Bitmap ToBitmapFromBinary(this string bits, int width, int height)
+        {
+            var bitmap = new Bitmap(width, height);
+            var x = 0;
+            var y = 0;
+            for (int i = 0; i < bits.Length; i += BitsInByte * 3)
+            {
+                var r = bits.Substring(i + 0 * BitsInByte, BitsInByte).ToByteFromBinary();
+                var g = bits.Substring(i + 1 * BitsInByte, BitsInByte).ToByteFromBinary();
+                var b = bits.Substring(i + 2 * BitsInByte, BitsInByte).ToByteFromBinary();
+                bitmap.SetPixel(x, y, Color.FromArgb(r, g, b));
+                x++;
+                if (x >= width)
+                {
+                    x = 0;
+                    y++;
+                }
+            }
+            return bitmap;
         }
     }
 }

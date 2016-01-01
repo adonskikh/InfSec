@@ -4,12 +4,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Steganography.ViewModel"
+             xmlns:converters="clr-namespace:Steganography.Converters"
              mc:Ignorable="d" Startup="Application_Startup">
     
     <Application.Resources>
         <!--Global View Model Locator-->
         <vm:ViewModelLocator x:Key="Locator"
                              d:IsDataSource="True" />
+        <converters:ImageConverter x:Key="ImageConverter" />
     </Application.Resources>
     
 </Application>

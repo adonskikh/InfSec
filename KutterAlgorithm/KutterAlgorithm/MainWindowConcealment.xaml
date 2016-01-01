@@ -1,0 +1,110 @@
+﻿<Window x:Class="Steganography.MainWindowConcealment"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+        xmlns:ignore="http://www.ignore.com"
+        mc:Ignorable="d ignore"
+        Width="800"
+        Height="480"
+        Title="Digital Signature Tool"
+        DataContext="{Binding Concealment, Source={StaticResource Locator}}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+                <Setter Property="Margin" Value="5"></Setter>
+                <Setter Property="FontSize" Value="18"></Setter>
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
+                <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+                <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+                <Setter Property="Margin" Value="5"></Setter>
+                <Setter Property="FontSize" Value="14"></Setter>
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
+                <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+                <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+                <Setter Property="Margin" Value="5"></Setter>
+                <Setter Property="FontSize" Value="18"></Setter>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="100"></ColumnDefinition>
+            <ColumnDefinition Width="100"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="0"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Column="0" Grid.Row="0" Margin="5,0,0,5">Original image</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="0" Margin="5,0,0,5">Processed image</TextBlock>
+
+
+            <DockPanel Grid.Column="0" Grid.Row="1">
+                <Button Width="100" DockPanel.Dock="Right" Command="{Binding HideCommand}">Hide</Button>
+                <Button Width="100" DockPanel.Dock="Right" Command="{Binding OpenOriginalImgCommand}">Browse...</Button>
+                <TextBox Text="{Binding OriginalImagePath, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            </DockPanel>
+            
+            <DockPanel Grid.Column="1" Grid.Row="1">
+                <Button Width="100" DockPanel.Dock="Right" Command="{Binding ShowCommand}">Restore</Button>
+                <Button Width="100" DockPanel.Dock="Right" Command="{Binding OpenProcessedImgCommand}">Browse...</Button>
+                <TextBox Text="{Binding ProcessedImagePath, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            </DockPanel>
+
+            <ScrollViewer Grid.Column="0" Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto" 
+                      HorizontalScrollBarVisibility="Auto">
+                <Grid Name="OriginalImageContainer" MouseLeftButtonDown="OriginalImageContainer_MouseLeftButtonDown" MouseMove="OriginalImageContainer_MouseMove" MouseLeftButtonUp="OriginalImageContainer_MouseLeftButtonUp" MouseLeave="OriginalImageContainer_MouseLeave">
+                    <Image
+                        Name="OriginalImage"
+                        Source="{Binding Path=OriginalImage, Converter={StaticResource ImageConverter} }" 
+                        Stretch="Uniform"
+                        VerticalAlignment="Top"
+                        />
+                    <Canvas Name="BackPlane">
+                        <Rectangle Name="SelectRectangle" Stroke="DarkOrange" Visibility="Collapsed" Fill="#77FFFFFF"></Rectangle>
+                    </Canvas>
+                </Grid>
+            </ScrollViewer>
+
+            <ScrollViewer Grid.Column="1" Grid.Row="2" 
+                      VerticalScrollBarVisibility="Auto" 
+                      HorizontalScrollBarVisibility="Auto">
+                <Image  
+                Source="{Binding Path=ProcessedImage, Converter={StaticResource ImageConverter} }"
+                Stretch="Uniform"
+                VerticalAlignment="Top"
+                />
+            </ScrollViewer>
+        </Grid>
+
+    </Grid>
+</Window>

@@ -16,12 +16,17 @@ namespace Steganography
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+#if CONCEALMENT
+            var mainView = new MainWindowConcealment();
+            mainView.Show();
+#else
 #if SIGNATURE
             var mainView = new MainWindowSignature();
             mainView.Show();
 #else
             var mainView = new MainWindow();
             mainView.Show();
+#endif
 #endif
         }
     }
